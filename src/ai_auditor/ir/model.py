@@ -149,10 +149,14 @@ class Node:
     attrs: dict[str, Any] = field(default_factory=dict)
 
 
+# Frameworks whose steps are Markdown instructions run by a coding agent (agents, skills, playbooks, rules)
+INSTRUCTION_FRAMEWORKS = frozenset({"claude_code", "devin", "cursor", "markdown"})
+
+
 @dataclass
 class LLMStep(Node):
     step_kind: StepKind = StepKind.CALL
-    framework: str | None = None  # anthropic, openai, langchain, claude_code, crewai, ...
+    framework: str | None = None  # anthropic, openai, langchain, claude_code, devin, cursor, markdown, crewai, ...
     model: ModelRef = field(default_factory=ModelRef)
     prompt: list[PromptPart] = field(default_factory=list)
     output: OutputSpec = field(default_factory=OutputSpec)

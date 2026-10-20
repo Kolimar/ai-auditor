@@ -113,9 +113,11 @@ configuración real de Claude Code.
   LLM-017) que coinciden con lo implementado. Eso puede favorecer al auditor en esos puntos.
 - Cambios posteriores a la medición de holdout v3:
   - se corrigió el texto de la nota de LLM-004 en `docs/RULES.md` para que coincida con el código;
-  - el auditor ya no recorre `~/.claude/plugins/marketplaces/`, el catálogo de marketplace que Claude Code no carga.
+  - el auditor ya no recorre `~/.claude/plugins/marketplaces/`, el catálogo de marketplace que Claude Code no carga;
+  - un archivo suelto pasado como ruta se clasifica por su ruta completa y, si es otro `.md`, se lee como
+    instrucciones.
 
-  Ningún fixture tiene esa carpeta, así que las cifras no cambian.
+  Ningún fixture tiene esa carpeta ni se analiza como archivo suelto, así que las cifras no cambian.
 
 ## Limitaciones
 
@@ -124,6 +126,9 @@ configuración real de Claude Code.
 - El recall en sistemas nuevos ronda 0.5: el auditor encuentra más o menos la mitad de lo etiquetado.
 - La confianza es heurística y no está recalibrada.
 - No se ha ejecutado ningún experimento contra un modelo real.
+- El soporte para Devin, Cursor y `.md` sueltos (`--md-instructions`), y el encargo para el agente (`--for-agent`,
+  con su lista de piezas externas), se añadieron después de estas mediciones. Tienen tests unitarios, pero ningún fixture del benchmark los cubre:
+  su calidad no está medida. Lo que encuentre el agente con `--for-agent` es su criterio, no una medición.
 
 ## Cómo reproducir
 

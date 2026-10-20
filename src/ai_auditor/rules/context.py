@@ -9,7 +9,7 @@ from typing import Iterable
 
 from ai_auditor.analyzers.engine import AnalysisContext, Rule, register
 from ai_auditor.analyzers.finding import Finding, Risk, Severity
-from ai_auditor.ir.model import EdgeKind, LLMStep, Node, NodeKind, StepKind, VarSource
+from ai_auditor.ir.model import INSTRUCTION_FRAMEWORKS, EdgeKind, LLMStep, Node, NodeKind, StepKind, VarSource
 from ai_auditor.parser.tokens import count_tokens
 from ai_auditor.rules._common import CLASS_A, CLASS_C, Builder, finding, potential, severity_for, skip_step
 
@@ -27,7 +27,7 @@ class ExcessiveContext(Rule):
     def check(self, ctx: AnalysisContext) -> Iterable[Finding]:
         cfg = ctx.config
         for step in ctx.ir.llm_steps():
-            if skip_step(step) or step.framework == "claude_code":
+            if skip_step(step) or step.framework in INSTRUCTION_FRAMEWORKS:
                 continue  # Claude Code bodies load on demand; always-loaded memory/descriptions are handled below
             p = ctx.profile(step)
             narrow = p.output_space in ("closed", "structured") and p.primary not in SUBJECT_TASKS
@@ -86,7 +86,7 @@ class ExcessiveContext(Rule):
                     yield f
         # one disproportionate description: routing text loaded in every session, whether or not the agent is used
         for step in ctx.ir.llm_steps():
-            if step.framework != "claude_code" or step.attrs.get("cc_type") not in ("agent", "skill") or skip_step(step):
+            if step.framework not in INSTRUCTION_FRAMEWORKS or step.attrs.get("cc_type") not in ("agent", "skill") or skip_step(step):
                 continue
             desc = step.description or ""
             dt = count_tokens(desc)
@@ -109,12 +109,12 @@ class ExcessiveContext(Rule):
             )
             if f:
                 yield f
-        desc_tokens = sum(count_tokens(s.description or "") for s in ctx.ir.llm_steps() if s.framework == "claude_code")
-        n = sum(1 for s in ctx.ir.llm_steps() if s.framework == "claude_code" and s.description)
+        desc_tokens = sum(count_tokens(s.description or "") for s in ctx.ir.llm_steps() if s.framework in INSTRUCTION_FRAMEWORKS)
+        n = sum(1 for s in ctx.ir.llm_steps() if s.framework in INSTRUCTION_FRAMEWORKS and s.description)
         if desc_tokens > 3000:
             b = Builder()
             b.pro("context_source", f"{n} agent/skill/command descriptions are always loaded: ~{desc_tokens} tokens per session", 0.4)
-            long_ones = sorted((count_tokens(s.description or ""), s.name) for s in ctx.ir.llm_steps() if s.framework == "claude_code")[-3:]
+            long_ones = sorted((count_tokens(s.description or ""), s.name) for s in ctx.ir.llm_steps() if s.framework in INSTRUCTION_FRAMEWORKS)[-3:]
             b.pro("context_source", f"longest: {[(name, t) for t, name in reversed(long_ones)]}", 0.1)
             f = finding(
                 self, ctx, None, b, CLASS_C, component="*system*", severity=Severity.LOW,
@@ -143,7 +143,7 @@ class RepeatedContext(Rule):
         owners: dict[str, set[str]] = defaultdict(set)
         sizes: dict[str, int] = {}
         # Claude Code agents/skills each run in their own context: shared text is not paid twice per request.
-        steps = {s.id: s for s in ctx.ir.llm_steps() if not skip_step(s) and s.framework != "claude_code"}
+        steps = {s.id: s for s in ctx.ir.llm_steps() if not skip_step(s) and s.framework not in INSTRUCTION_FRAMEWORKS}
         for s in steps.values():
             for para in _paragraphs(s.static_text({"system", "developer", "instructions", "user"})):
                 h = hashlib.sha1(para.encode()).hexdigest()
@@ -192,7 +192,7 @@ class MissingCaching(Rule):
 
     def check(self, ctx: AnalysisContext) -> Iterable[Finding]:
         for step in ctx.ir.llm_steps():
-            if skip_step(step) or step.framework == "claude_code":
+            if skip_step(step) or step.framework in INSTRUCTION_FRAMEWORKS:
                 continue
             p = ctx.profile(step)
             info = p.model
@@ -348,7 +348,7 @@ class ExcessiveTools(Rule):
             if skip_step(step):
                 continue
             # Claude Code: an explicit list of built-in tools *restricts* the default set; only MCP tools add schemas
-            n = step.attrs.get("tools_count") if step.framework != "claude_code" else sum(1 for t in step.tool_names if t.lower().startswith("mcp__"))
+            n = step.attrs.get("tools_count") if step.framework not in INSTRUCTION_FRAMEWORKS else sum(1 for t in step.tool_names if t.lower().startswith("mcp__"))
             tok = int(step.attrs.get("tools_tokens") or 0)
             b = Builder()
             if isinstance(n, int) and n >= cfg.tool_count_warn:
@@ -359,7 +359,7 @@ class ExcessiveTools(Rule):
                     b.pro("prompt_text", f"instructions reference only {len(mentioned)} of them: {mentioned[:5]}", 0.2)
             elif tok >= cfg.tool_tokens_warn:
                 b.pro("ir", f"~{tok} tokens of tool schemas per request", 0.4, step.location)
-            elif step.framework == "claude_code" and step.attrs.get("tools_inherited") and has_mcp and step.attrs.get("cc_type") == "agent":
+            elif step.framework in INSTRUCTION_FRAMEWORKS and step.attrs.get("tools_inherited") and has_mcp and step.attrs.get("cc_type") == "agent":
                 b.pro("ir", "subagent omits `tools`, so it inherits every tool including all configured MCP servers", 0.3, step.location)
             if not b.evidence:
                 continue

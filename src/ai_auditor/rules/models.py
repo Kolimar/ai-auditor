@@ -7,7 +7,7 @@ from typing import Iterable
 
 from ai_auditor.analyzers.engine import AnalysisContext, Rule, register
 from ai_auditor.analyzers.finding import Finding, Risk, Severity
-from ai_auditor.ir.model import LLMStep, StepKind
+from ai_auditor.ir.model import INSTRUCTION_FRAMEWORKS, LLMStep, StepKind
 from ai_auditor.model_routing.catalog import TIER_ORDER
 from ai_auditor.rules._common import CLASS_C, Builder, cc_procedure, finding, mechanical_profile, model_alternatives, potential, severity_for, skip_step
 
@@ -50,10 +50,10 @@ class LargeModelSimpleTask(Rule):
             info = p.model
             if info is None or info.tier not in ("frontier", "large"):
                 continue
-            cc_commands = step.framework == "claude_code" and len(step.attrs.get("fixed_commands") or []) >= 2 and not p.tasks.keys() & OPEN_TASKS
+            cc_commands = step.framework in INSTRUCTION_FRAMEWORKS and len(step.attrs.get("fixed_commands") or []) >= 2 and not p.tasks.keys() & OPEN_TASKS
             if cc_procedure(step, ctx.profile(step)) and not cc_commands:
                 continue  # task profile of a long tool-using procedure is not reliable enough to call it "simple"
-            cc_mechanical = step.framework == "claude_code" and mechanical_profile(p)  # edits files: no output contract
+            cc_mechanical = step.framework in INSTRUCTION_FRAMEWORKS and mechanical_profile(p)  # edits files: no output contract
             if not _simple_profile(p) and not cc_commands and not cc_mechanical:
                 continue
             mechanical = p.primary in ("format", "validate_schema", "compute") or (p.primary == "extract" and p.input_structured)
@@ -153,7 +153,7 @@ class MissingModelRouting(Rule):
     def check(self, ctx: AnalysisContext) -> Iterable[Finding]:
         by_model: dict[str, list[LLMStep]] = defaultdict(list)
         for step in ctx.ir.llm_steps():
-            if skip_step(step) or step.framework == "claude_code":
+            if skip_step(step) or step.framework in INSTRUCTION_FRAMEWORKS:
                 continue
             info = ctx.profile(step).model
             if info is not None:

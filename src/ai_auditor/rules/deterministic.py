@@ -7,7 +7,7 @@ from typing import Iterable
 
 from ai_auditor.analyzers.engine import AnalysisContext, Rule, register
 from ai_auditor.analyzers.finding import EvidenceLevel, Finding, Risk, Severity
-from ai_auditor.ir.model import StepKind, VarSource
+from ai_auditor.ir.model import INSTRUCTION_FRAMEWORKS, StepKind, VarSource
 from ai_auditor.rules._common import CLASS_B, Builder, cc_procedure, finding, potential, severity_for, skip_step
 
 FIDELITY_VALIDATION = (
@@ -274,7 +274,7 @@ class Precomputation(Rule):
 
     def check(self, ctx: AnalysisContext) -> Iterable[Finding]:
         for step in ctx.ir.llm_steps():
-            if skip_step(step) or step.framework == "claude_code" or step.step_kind == StepKind.AGENT or step.tool_names:
+            if skip_step(step) or step.framework in INSTRUCTION_FRAMEWORKS or step.step_kind == StepKind.AGENT or step.tool_names:
                 continue
             if not step.prompt:
                 continue
@@ -366,7 +366,7 @@ class DeterministicToolCalling(Rule):
             if m:
                 b.pro("prompt_text", f"instructions fix the call: '{m.group(0)[:90]}'", 0.45)
             cmds = step.attrs.get("fixed_commands") or []
-            cc = step.framework == "claude_code"
+            cc = step.framework in INSTRUCTION_FRAMEWORKS
             if cc and len(cmds) >= 2:
                 b.pro("prompt_text", f"agent instructions are a fixed command sequence: {cmds[:5]}", 0.45)
                 interpretive = sorted(p.tasks.keys() & {"reason", "generate", "summarize", "classify", "decide", "validate_semantic", "extract"})

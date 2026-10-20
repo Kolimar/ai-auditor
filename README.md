@@ -1,6 +1,8 @@
 # ai-auditor — AI Workflow Optimization Auditor
 
-Analiza un sistema basado en LLMs (código Python con SDKs/frameworks, agentes, skills y comandos de Claude Code) y responde:
+Analiza un sistema basado en LLMs: código Python con SDKs y frameworks, agentes, skills y comandos de Claude Code,
+skills de Devin y Cursor, playbooks de Devin, reglas y comandos de Cursor, o carpetas de prompts sueltos. Responde a
+esta pregunta:
 
 > **¿Qué partes de este sistema necesitan realmente un LLM y cuáles podrían resolverse de forma más barata, rápida,
 > determinística o fiable — y con qué evidencia?**
@@ -15,6 +17,10 @@ No es un "LLM que revisa prompts". El análisis por defecto es **determinístico
 - conclusiones positivas (**LLM-000, el uso del LLM está justificado**), para que se vea qué se consideró y por qué no se toca;
 - opcionalmente, **trazas runtime**, **destilación** y **experimentos contrafactuales** que convierten hipótesis en
   mediciones.
+
+Se puede usar sola, desde la terminal, o desde un agente de IA (Claude Code, Devin, Cursor) con su skill. Esta segunda
+forma es **la más completa**: el agente revisa lo que el análisis determinista no supo clasificar y audita el flujo
+entero, incluidos los repos, paquetes y scripts que el flujo usa (ver [Uso desde un agente de IA](#uso-desde-un-agente-de-ia)).
 
 > ¿No programas? Empieza por la **[guía fácil](GUIA.md)**: qué es, cómo usarlo en 3 pasos y cómo leer el informe.
 
@@ -34,7 +40,59 @@ ai-auditor analyze ./my-agent-system -f markdown -o audit.md
 ai-auditor analyze ./my-agent-system --traces ./traces     # + datos runtime (JSONL / OTLP-JSON)
 ai-auditor analyze ./my-agent-system -f sarif -o audit.sarif --fail-on HIGH_CONFIDENCE   # CI
 ai-auditor analyze ~/.claude                               # agentes, skills y comandos de Claude Code
+ai-auditor analyze .claude/agents/reviewer.md              # un solo archivo (cualquier .md se lee como instrucciones)
+ai-auditor analyze ./mi-repo                               # también *.devin.md, .cursorrules, .cursor/rules, .cursor/commands
+ai-auditor analyze ./playbooks --md-instructions           # carpeta de .md sueltos (p. ej. playbooks exportados)
+ai-auditor analyze ./my-agent-system --for-agent           # + encargo para el agente de IA que ejecuta la herramienta
 ```
+
+## Uso desde un agente de IA
+
+Es la forma más completa de usar la herramienta. El análisis sigue sin llamar a ninguna IA: el refuerzo lo aporta el
+agente que ya la está ejecutando, con su propio criterio.
+
+Con `--for-agent`, el informe termina con un encargo para ese agente:
+
+- los pasos que el análisis determinista no supo clasificar, o que dio por justificados con poca evidencia;
+- los avisos más débiles, para confirmarlos o descartarlos;
+- las **piezas externas** que mencionan las instrucciones y que la herramienta no vio: repos que se clonan, descargas,
+  paquetes (`uvx`, `npx`…), scripts y servidores MCP;
+- una rúbrica con los patrones de cada paso y los del flujo entero: contexto repetido entre fases, saltos que no
+  aportan, pasos independientes en serie, trabajo repetido en cada ejecución, repos enteros en contexto y bucles sin
+  límite.
+
+La skill `skills/ai-auditor/SKILL.md` hace todo el recorrido:
+
+1. Elige qué analizar: un archivo, una carpeta, un repositorio (si es una URL, lo clona sin historial en una carpeta
+   temporal) o tus skills instaladas.
+2. Ejecuta el auditor con `--for-agent` y sigue el encargo.
+3. Si pides el flujo completo, dibuja la cadena, audita cada pieza externa (sin ejecutarla) y revisa la cadena entera.
+4. Devuelve un informe con la recomendación de la herramienta, la revisión del agente (marcada como su criterio, no
+   como medición), los problemas del flujo y lo que sí necesita IA. Si se lo pides, lo guarda en un `.md`.
+
+Instalación de la skill (una vez):
+
+| agente | carpeta |
+|---|---|
+| Claude Code | `~/.claude/skills/ai-auditor/` (o `.claude/skills/` del proyecto) |
+| Cursor | lee también `~/.claude/skills/`; si no usas Claude Code, `~/.cursor/skills/ai-auditor/` |
+| Devin CLI (local) | `~/.config/devin/skills/ai-auditor/` (o `.devin/skills/` del proyecto) |
+| Devin (web) | pega el contenido de `SKILL.md` como playbook |
+
+```bash
+mkdir -p ~/.claude/skills && cp -r skills/ai-auditor ~/.claude/skills/
+```
+
+La skill usa `ai-auditor` si está instalado y, si no, lo ejecuta con
+`uvx --from git+https://github.com/Kolimar/ai-auditor`, así que basta con tener `uv`.
+
+Ejemplos de lo que se le puede pedir:
+
+- «audítame la carpeta ~/proyectos/bot»
+- «audita este archivo: .claude/agents/reviewer.md»
+- «audita https://github.com/usuario/repo»
+- «audita el flujo completo de la skill deploy, incluidos los repos que clona»
+- «revisa si mi ciclo SDD tiene pasos que sobran o contexto repetido y guárdame el informe en informe.md»
 
 Otros comandos:
 
@@ -173,9 +231,13 @@ Detalle, análisis de errores y declaraciones en `docs/EVALUATION.md`.
 
 - Extractores: Python y notebooks Jupyter (SDKs de Anthropic, OpenAI —Chat Completions y Responses—, Google GenAI,
   LiteLLM, Ollama; modelos de chat de LangChain; agentes de OpenAI Agents SDK, PydanticAI, CrewAI, Google ADK, Claude
-  Agent SDK, LangGraph/LangChain y, sin verificar, AutoGen) y Claude Code (Markdown con frontmatter). No hay extractores
+  Agent SDK, LangGraph/LangChain y, sin verificar, AutoGen), Claude Code (Markdown con frontmatter), playbooks de Devin
+  (`*.devin.md`), skills de Devin y Cursor (`SKILL.md`) y reglas y comandos de Cursor. Los playbooks que solo existen en la web de Devin hay que exportarlos
+  primero; en Devin y Cursor no se evalúa la elección de modelo, porque el fichero no la fija. No hay extractores
   para TypeScript ni para configuraciones YAML de orquestadores: los agentes de CrewAI definidos en `agents.yaml`
   aparecen sin prompt.
+- La herramienta solo ve el archivo o la carpeta que recibe: no sigue repos clonados, paquetes ni scripts externos.
+  Con `--for-agent` los lista, y es el agente quien los audita. Esa revisión del agente no está medida.
 - Los tokens se cuentan con una heurística (±25 %) salvo que `tiktoken` esté instalado; en ambos casos es una aproximación.
 - La confianza es heurística. En holdout v3 acertaron el 73 % de los hallazgos HYPOTHESIS (44) y el 83 % de los LIKELY
   (24), con ECE 0.20. En holdout v2 eran el 95 % y el 87 %. La brecha de confianza baja porque bajan los aciertos, no

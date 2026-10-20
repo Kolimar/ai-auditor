@@ -240,6 +240,10 @@ positivos en el golden dataset. Un experimento REJECT también convierte la reco
 
 ## Política para Claude Code (agentes, skills, comandos)
 
+Se aplica igual a los playbooks de Devin (`*.devin.md`), a las reglas y comandos de Cursor y a los `.md` sueltos
+leídos con `--md-instructions`. Fuera de Claude Code no hay lista de herramientas: se asume el conjunto completo
+del agente. Las reglas `.cursorrules` y `alwaysApply: true` cuentan como memoria siempre cargada.
+
 - Subagentes y skills se ejecutan en contextos separados: LLM-005 (contexto repetido) no se aplica entre ellos.
 - Una lista explícita de herramientas built-in **restringe** el conjunto por defecto; solo las herramientas `mcp__`
   añaden schemas (LLM-023).

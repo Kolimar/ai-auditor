@@ -30,7 +30,7 @@ def _canon(x):
 
 def _fingerprint() -> str:
     h = hashlib.sha256()
-    for root in sorted((REPO / "tests" / "golden" / "systems").iterdir()):
+    for root in sorted(d for d in (REPO / "tests" / "golden" / "systems").iterdir() if d.is_dir()):
         ir, _ = extract_project(root, AuditConfig(), use_cache=False)
         d = ir.to_dict()
         d.pop("root", None)

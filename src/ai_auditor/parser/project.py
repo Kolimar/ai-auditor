@@ -14,7 +14,7 @@ from pathlib import Path
 
 from ai_auditor import __version__
 from ai_auditor.config import AuditConfig
-from ai_auditor.ir.model import Diagnostic, FileRecord, LLMStep, NodeKind, SourceLocation, SystemIR
+from ai_auditor.ir.model import INSTRUCTION_FRAMEWORKS, Diagnostic, FileRecord, LLMStep, NodeKind, SourceLocation, SystemIR
 from ai_auditor.parser.claude_code import EXTRACTOR_VERSION as CC_VERSION
 from ai_auditor.parser.claude_code import extract_claude_file, link_claude_code
 from ai_auditor.parser.discovery import discover
@@ -64,7 +64,7 @@ class _Cache:
 
 def extract_project(root: Path, config: AuditConfig, use_cache: bool = True) -> tuple[SystemIR, dict]:
     root = root.resolve()
-    files = discover(root, config.exclude)
+    files = discover(root, config.exclude, config.markdown_instructions)
     if config.notebooks == "skip":
         files = [sf for sf in files if not sf.rel.endswith(".ipynb")]
     cache = _Cache(root, use_cache)
@@ -74,7 +74,7 @@ def extract_project(root: Path, config: AuditConfig, use_cache: bool = True) -> 
         if sf.kind == "python":
             continue
         digest = sf.sha256()
-        key = hashlib.sha256(f"{__version__}|{CC_VERSION}|{sf.rel}|{digest}".encode()).hexdigest()[:32]
+        key = hashlib.sha256(f"{__version__}|{CC_VERSION}|{sf.kind}|{sf.rel}|{digest}".encode()).hexdigest()[:32]
         part = cache.get(key)
         if part is None:
             try:
@@ -152,7 +152,7 @@ def _dedupe_claude_code(ir: SystemIR) -> None:
     seen: dict[tuple, str] = {}
     dupes: dict[str, list[str]] = {}
     for step in sorted(ir.llm_steps(), key=lambda s: (s.location.file if s.location else "")):
-        if step.framework != "claude_code":
+        if step.framework not in INSTRUCTION_FRAMEWORKS:
             continue
         key = (step.attrs.get("cc_type"), step.name, hashlib.sha1(step.static_text().encode()).hexdigest(),
                tuple(step.tool_names), step.model.raw)

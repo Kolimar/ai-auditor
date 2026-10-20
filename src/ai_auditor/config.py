@@ -40,6 +40,8 @@ class AuditConfig:
     pricing_file: str | None = None
     # Jupyter notebooks: "exploratory" (extracted, findings discarded as non-production), "production" or "skip"
     notebooks: str = "exploratory"
+    # every .md that is not a README/CHANGELOG/... is read as agent instructions (playbooks exported from any tool)
+    markdown_instructions: bool = False
 
     @classmethod
     def load(cls, root: Path, explicit: Path | None = None) -> AuditConfig:

@@ -12,7 +12,7 @@ import re
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
-from ai_auditor.ir.model import LLMStep, NodeKind, OutputKind, VarSource
+from ai_auditor.ir.model import INSTRUCTION_FRAMEWORKS, LLMStep, NodeKind, OutputKind, VarSource
 from ai_auditor.parser.tokens import count_tokens
 
 if TYPE_CHECKING:
@@ -335,7 +335,7 @@ def build_profile(step: LLMStep, graph: WorkflowGraph, catalog: ModelCatalog) ->
         priority = {"format": 0, "validate_schema": 0, "validate_semantic": 0, "compute": 1, "extract": 2, "classify": 2,
                     "decide": 3, "translate": 3, "summarize": 3, "generate": 3, "code": 3, "reason": 5, "conversation": 6}
         p.primary = min(p.tasks, key=lambda t: (first_pos(t) // 400, priority.get(t, 4), first_pos(t)))
-    if step.framework == "claude_code" and body.strip() and desc.strip() and p.primary not in MECHANICAL and not p.tasks.keys() & SEMANTIC_OPEN:
+    if step.framework in INSTRUCTION_FRAMEWORKS and body.strip() and desc.strip() and p.primary not in MECHANICAL and not p.tasks.keys() & SEMANTIC_OPEN:
         # the description declares the job ("Converts BibTeX entries into APA 7 references"); the body only details it
         desc_instr = re.sub(r"\{[^{}]{0,200}\}", " ", desc)
         declared = [t for t in ("format", "compute", "validate_schema") if TASK_LEXICON[t].search(desc_instr)]

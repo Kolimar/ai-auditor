@@ -14,7 +14,7 @@ from ai_auditor.analyzers.finding import (
     Severity,
     StaticPotential,
 )
-from ai_auditor.ir.model import LLMStep, SourceLocation
+from ai_auditor.ir.model import INSTRUCTION_FRAMEWORKS, LLMStep, SourceLocation
 
 # Risk classes: the strongest level that static
 # evidence may claim depends on whether the change can alter outputs.
@@ -59,7 +59,7 @@ def cc_procedure(step: LLMStep, prof=None) -> bool:
     Acting (or inherited) tools alone do not make a procedure: a short body whose task profile is a mechanical,
     bounded transformation (format, compute, schema check, extraction, without judgment) is still a candidate.
     """
-    if step.framework != "claude_code":
+    if step.framework not in INSTRUCTION_FRAMEWORKS:
         return False
     if int(step.attrs.get("body_tokens") or 0) > 600:
         return True

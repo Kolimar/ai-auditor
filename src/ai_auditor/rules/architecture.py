@@ -9,7 +9,7 @@ from typing import Iterable
 
 from ai_auditor.analyzers.engine import AnalysisContext, Rule, register
 from ai_auditor.analyzers.finding import EvidenceLevel, Finding, Risk, Severity
-from ai_auditor.ir.model import EdgeKind, LLMStep, Node, NodeKind, StepKind, VarSource
+from ai_auditor.ir.model import INSTRUCTION_FRAMEWORKS, EdgeKind, LLMStep, Node, NodeKind, StepKind, VarSource
 from ai_auditor.optimization.profile import TASK_LEXICON
 from ai_auditor.parser.tokens import count_tokens
 from ai_auditor.rules._common import CLASS_A, CLASS_C, Builder, finding, potential, severity_for, skip_step
@@ -74,7 +74,7 @@ class RedundantAgent(Rule):
             if a.location == b_.location:
                 continue
             # copies inside separate applications of a monorepo/examples collection never run in the same system
-            if a.framework != "claude_code" and b_.framework != "claude_code" and \
+            if a.framework not in INSTRUCTION_FRAMEWORKS and b_.framework not in INSTRUCTION_FRAMEWORKS and \
                     _app_root(root, a.location and a.location.file, roots) != _app_root(root, b_.location and b_.location.file, roots):
                 continue
             la, lb = len(sh[a.id]), len(sh[b_.id])
@@ -97,7 +97,7 @@ class RedundantAgent(Rule):
                 srcs_b = {v.source for v in other.variables()}
                 if srcs_a != srcs_b:
                     b.con("ir", "the two steps receive different kinds of input", 0.25)
-                same_def = this.name == other.name and this.framework == "claude_code"
+                same_def = this.name == other.name and this.framework in INSTRUCTION_FRAMEWORKS
                 f = finding(
                     self, ctx, this, b, CLASS_C, severity=Severity.LOW,
                     reasoning="Two steps with near-identical instructions usually do the same job; keeping both duplicates maintenance and, if both run, cost.",
@@ -119,7 +119,7 @@ class RedundantAgent(Rule):
         def summarizes(s: LLMStep) -> bool:
             # a Claude Code agent's description states its job ("Summarizes one paper into a note")
             return ctx.profile(s).primary == "summarize" or (
-                s.framework == "claude_code" and bool(TASK_LEXICON["summarize"].search(s.description or "")))
+                s.framework in INSTRUCTION_FRAMEWORKS and bool(TASK_LEXICON["summarize"].search(s.description or "")))
 
         for step in steps:
             if not summarizes(step):
@@ -167,7 +167,7 @@ class UnnecessaryDelegation(Rule):
         for step in ctx.ir.llm_steps():
             if skip_step(step) or step.step_kind != StepKind.AGENT:
                 continue
-            if step.framework == "claude_code" and (step.attrs.get("cc_type") in ("skill", "command") or int(step.attrs.get("body_tokens") or 0) > 400):
+            if step.framework in INSTRUCTION_FRAMEWORKS and (step.attrs.get("cc_type") in ("skill", "command") or int(step.attrs.get("body_tokens") or 0) > 400):
                 # skills and substantial agents do their own work; a command is a prompt the user types into the main
                 # session, which runs anyway: invoking an agent from it adds no hop
                 continue
@@ -180,7 +180,7 @@ class UnnecessaryDelegation(Rule):
                 continue
             b = Builder()
             b.pro("graph", f"only job is delegating to a single agent '{target.name}'; no tools of its own", 0.45, step.location)
-            if step.framework == "claude_code":
+            if step.framework in INSTRUCTION_FRAMEWORKS:
                 body = int(step.attrs.get("body_tokens") or 0)
                 if body < 150:
                     b.pro("prompt_text", f"short body (~{body} tokens) beyond the delegation", 0.15)
@@ -317,7 +317,7 @@ class UnboundedLoop(Rule):
                 f.related = [t.id for t in targets]
                 yield f
         for step in ctx.ir.llm_steps():
-            if skip_step(step) or step.step_kind != StepKind.AGENT or step.framework == "claude_code":
+            if skip_step(step) or step.step_kind != StepKind.AGENT or step.framework in INSTRUCTION_FRAMEWORKS:
                 continue
             prov = (step.attrs.get("provenance") or {}).get("max_iterations")
             if prov == "absent" and step.max_iterations is None:

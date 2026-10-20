@@ -94,6 +94,48 @@ uv run ai-auditor analyze /ruta/de/tu/proyecto -f markdown -o ~/Escritorio/infor
 uv run ai-auditor analyze ~/.claude
 ```
 
+**Para Devin y Cursor** no hace falta nada especial: si tu proyecto tiene playbooks de Devin (archivos `.devin.md`) o
+reglas y comandos de Cursor (`.cursorrules`, carpeta `.cursor`), los revisa solo.
+
+**Para revisar un solo archivo** (una skill, un agente, un playbook o un prompt), pon su ruta:
+
+```bash
+uv run ai-auditor analyze /ruta/del/archivo.md
+```
+
+**Para una carpeta con instrucciones sueltas** (por ejemplo, playbooks que copiaste de la web de Devin y guardaste como
+`deploy.md`, `revisar-pr.md`…), añade `--md-instructions` al final. Así lee todos los `.md` de la carpeta, menos el
+README:
+
+```bash
+uv run ai-auditor analyze /ruta/de/la/carpeta --md-instructions
+```
+
+## La forma más completa: con tu asistente de IA (Claude Code, Devin, Cursor)
+
+La herramienta sola encuentra más o menos la mitad de los problemas. Si la usa tu asistente de IA, este revisa el
+resto con su propio criterio. Así no pagas nada extra: usa la IA que ya tienes.
+
+Además, tu asistente puede revisar **un flujo entero**. Por ejemplo, una skill que llama a otra herramienta, que a su
+vez descarga un repositorio con más skills. La herramienta sola solo ve la carpeta que le das; el asistente sigue la
+cadena, revisa cada pieza y te dice dónde se repite trabajo, dónde se carga demasiada información y qué pasos sobran.
+
+1. Instala la skill una sola vez. Copia la carpeta `skills/ai-auditor` de esta herramienta en la carpeta de skills de
+   tu asistente:
+   - Claude Code: `~/.claude/skills/` (Cursor también la lee de ahí);
+   - Cursor sin Claude Code: `~/.cursor/skills/`;
+   - Devin en tu ordenador: `~/.config/devin/skills/`;
+   - Devin en la web: copia el texto de `SKILL.md` y guárdalo como playbook.
+2. Pídele a tu asistente, con tus palabras, por ejemplo:
+   - «audítame la carpeta ~/proyectos/bot»;
+   - «audita este archivo»;
+   - «audita este repositorio: https://github.com/usuario/repo»;
+   - «audita el flujo completo de mi skill deploy y guárdame el informe en informe.md».
+
+Te responderá por partes: un resumen con las tres mejoras más importantes, lo que encontró la herramienta, lo que
+encontró él revisando y, si lo pediste, los problemas del flujo entero. Lo que encuentra el asistente es su opinión, no
+una medición: tómalo como una sugerencia que hay que comprobar.
+
 ## Cómo leer el informe
 
 Este es un aviso real, y debajo su explicación:
@@ -164,8 +206,13 @@ No necesariamente. Puede que el proyecto esté bien, o que haya algo que la herr
 encuentra más o menos la mitad).
 
 **¿Qué proyectos entiende?**
-Programas en Python que usan IA (OpenAI, Anthropic, Google, LangChain, CrewAI…) y los agentes, skills y comandos de
-Claude Code. No entiende otros lenguajes, como JavaScript.
+Programas en Python que usan IA (OpenAI, Anthropic, Google, LangChain, CrewAI…), los agentes, skills y comandos de
+Claude Code, las skills y playbooks de Devin, las skills, reglas y comandos de Cursor, y carpetas de instrucciones
+sueltas en `.md`. No entiende programas en otros lenguajes, como JavaScript.
+
+**¿Puede revisar un repositorio de internet?**
+La herramienta sola, no: primero hay que descargarlo. Tu asistente de IA lo hace por ti si le pasas el enlace (ver «La
+forma más completa»).
 
 **Me sale un error.**
 Comprueba que estás dentro de la carpeta de la herramienta (paso 2) y que la ruta del proyecto existe. Si sigue

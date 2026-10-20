@@ -1,4 +1,5 @@
-"""Extractor for Claude Code configuration: subagents, skills, commands, memory files, MCP config.
+"""Extractor for Markdown agent instructions: Claude Code (subagents, skills, commands, memory files, MCP config),
+Devin playbooks, Cursor rules and commands, and loose ``.md`` files read with ``--md-instructions``.
 
 Mapping to the IR:
 
@@ -10,6 +11,10 @@ Mapping to the IR:
   that already exists next to the instructions).
 * ``CLAUDE.md`` / ``AGENTS.md`` -> CONTEXT_SOURCE injected into every session.
 * ``.mcp.json`` -> one TOOL node per MCP server (its tool list is only known at runtime).
+* Devin ``*.devin.md``, Cursor ``.cursor/commands/*.md`` and loose ``.md`` -> like a command: instructions the
+  user hands to an agent that has its full toolset.
+* Cursor ``.cursorrules`` and ``.cursor/rules/*.mdc`` with ``alwaysApply: true`` -> CONTEXT_SOURCE added to every
+  request; any other ``.mdc`` rule -> like a skill (description offered to the agent, body read on demand).
 """
 
 from __future__ import annotations
@@ -22,6 +27,7 @@ from typing import Any
 import yaml
 
 from ai_auditor.ir.model import (
+    INSTRUCTION_FRAMEWORKS,
     EdgeKind,
     LLMStep,
     ModelRef,
@@ -36,7 +42,7 @@ from ai_auditor.ir.model import (
 from ai_auditor.parser.discovery import SourceFile
 from ai_auditor.parser.tokens import count_tokens
 
-EXTRACTOR_VERSION = "cc-5"  # bump whenever the extracted IR changes (it keys the IR cache)
+EXTRACTOR_VERSION = "cc-6"  # bump whenever the extracted IR changes (it keys the IR cache)
 
 _FRONTMATTER = re.compile(r"\A---\s*\n(.*?)\n---\s*\n?", re.S)
 # Commands the instructions tell the model to run: `git status`, `npm test`, `dbt run --select x`, or lines of a shell
@@ -51,6 +57,12 @@ _NOT_CLI = {"the", "a", "an", "if", "for", "and", "or", "is", "to", "of", "in", 
             "un", "una", "de", "y", "o", "en", "que", "true", "false", "null", "none"}
 _SHELL_FENCE = {"", "bash", "sh", "shell", "console", "zsh", "terminal", "powershell", "ps1", "cmd", "bat", "fish"}
 _SCRIPT_SUFFIXES = {".py", ".sh", ".js", ".ts", ".mjs", ".rb"}
+# file kind -> (cc_type, framework) of the step it becomes
+_STEP_KINDS = {
+    "claude_agent": ("agent", "claude_code"), "claude_skill": ("skill", "claude_code"), "claude_command": ("command", "claude_code"),
+    "devin_playbook": ("command", "devin"), "cursor_command": ("command", "cursor"), "cursor_rule": ("skill", "cursor"),
+    "loose_md": ("command", "markdown"),
+}
 # a clause that states a policy or gives examples lists *permitted* commands, not steps to run
 _POLICY = re.compile(r"(?i)\b(only|allowed|permitted|never|do not|don't|must not|forbidden|prohibited|read-only|e\.g\.|such as|"
                      r"for example|solo|s[oó]lo|nunca|permitid[oa]s?|prohibid[oa]s?|por ejemplo)\b")
@@ -202,6 +214,33 @@ def extract_claude_file(sf: SourceFile) -> SystemIR:
         )
         return ir
 
+    if sf.kind in ("cursor_rules_file", "cursor_rule"):
+        fm, body, _, err = parse_frontmatter(text)
+        if sf.kind == "cursor_rules_file" or str(fm.get("alwaysApply")).lower() == "true":
+            if err:
+                ir.warn("FRONTMATTER_ERROR", f"invalid YAML frontmatter: {err}", loc)
+            # added to every Cursor request, like a root CLAUDE.md is to every Claude Code session
+            ir.add(
+                Node(
+                    id=stable_id("ctx", sf.rel),
+                    kind=NodeKind.CONTEXT_SOURCE,
+                    name=sf.rel,
+                    location=loc,
+                    attrs={
+                        "framework": "cursor",
+                        "always_loaded": True,
+                        "loading": "every request",
+                        "loaded_by": "cursor",
+                        "realpath": str(sf.path.resolve()),
+                        "est_tokens": count_tokens(body),
+                        "lines": body.count("\n") + 1,
+                        "imports": [],
+                        "text": body,
+                    },
+                )
+            )
+            return ir
+
     if sf.kind == "mcp_config":
         try:
             servers = (json.loads(text) or {}).get("mcpServers", {})
@@ -224,9 +263,14 @@ def extract_claude_file(sf: SourceFile) -> SystemIR:
     fm, body, body_line, err = parse_frontmatter(text)
     if err:
         ir.warn("FRONTMATTER_ERROR", f"invalid YAML frontmatter: {err}", loc)
-    cc_type = {"claude_agent": "agent", "claude_skill": "skill", "claude_command": "command"}[sf.kind]
+    cc_type, framework = _STEP_KINDS[sf.kind]
     path = Path(sf.rel)
-    default_name = path.parent.name if cc_type == "skill" else path.stem
+    if sf.kind == "claude_skill":
+        default_name = path.parent.name
+    elif sf.kind == "devin_playbook":
+        default_name = path.name[: -len(".devin.md")]
+    else:
+        default_name = path.stem
     name = str(fm.get("name") or default_name)
     desc = _description(fm)
 
@@ -243,7 +287,8 @@ def extract_claude_file(sf: SourceFile) -> SystemIR:
     attrs: dict[str, Any] = {
         "cc_type": cc_type,
         "frontmatter_keys": sorted(fm),
-        "tools_inherited": cc_type == "agent" and tools_key not in fm,
+        # outside Claude Code there is no tool list: the agent runs the instructions with its full toolset
+        "tools_inherited": (cc_type == "agent" and tools_key not in fm) if framework == "claude_code" else True,
         "fixed_commands": procedure_commands(body),
         "body_tokens": count_tokens(body),
         "body_lines": body.count("\n") + 1,
@@ -253,7 +298,7 @@ def extract_claude_file(sf: SourceFile) -> SystemIR:
         "disable_model_invocation": bool(fm.get("disable-model-invocation")),
         "provenance": {"model": "literal" if "model" in fm else "absent"},
     }
-    if cc_type == "skill":
+    if sf.kind == "claude_skill":
         skill_dir = sf.path.parent
         attrs["bundled_scripts"] = sorted(
             p.relative_to(skill_dir).as_posix() for p in skill_dir.rglob("*") if p.suffix in _SCRIPT_SUFFIXES
@@ -268,7 +313,7 @@ def extract_claude_file(sf: SourceFile) -> SystemIR:
             location=loc,
             attrs=attrs,
             step_kind=StepKind.AGENT,
-            framework="claude_code",
+            framework=framework,
             model=model,
             prompt=prompt,
             tool_names=tools,
@@ -282,7 +327,7 @@ def extract_claude_file(sf: SourceFile) -> SystemIR:
 
 def link_claude_code(ir: SystemIR) -> None:
     """Cross-file edges: delegation by name mention, preloaded skills, memory injection."""
-    steps = [s for s in ir.llm_steps() if s.framework == "claude_code"]
+    steps = [s for s in ir.llm_steps() if s.framework in INSTRUCTION_FRAMEWORKS]
     by_name = {s.name: s for s in steps}
     distinctive = {n for n in by_name if "-" in n or "_" in n}
     plain_lower = {n.lower(): n for n in by_name if n not in distinctive}

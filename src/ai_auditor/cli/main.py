@@ -28,6 +28,8 @@ def _config(args: argparse.Namespace):
         cfg.pricing_file = args.pricing
     if getattr(args, "min_level", None):
         cfg.min_level = args.min_level
+    if getattr(args, "md_instructions", False):
+        cfg.markdown_instructions = True
     return cfg
 
 
@@ -43,6 +45,10 @@ def cmd_analyze(args: argparse.Namespace) -> int:
     from ai_auditor.audit import audit, min_level_filter
     from ai_auditor.reporting.render import RENDERERS
 
+    if args.for_agent and args.format == "sarif":
+        from ai_auditor.config import UsageError  # noqa: PLC0415
+
+        raise UsageError("--for-agent works with the text, markdown and json formats")
     cfg = _config(args)
     runtime = None
     if args.traces:
@@ -59,7 +65,20 @@ def cmd_analyze(args: argparse.Namespace) -> int:
         experiments = load_results(Path(args.experiments))
     res = audit(Path(args.path), cfg, use_cache=not args.no_cache, runtime=runtime, only_rules=only, experiments=experiments)
     findings = min_level_filter(res.findings, cfg.min_level)
-    _write(RENDERERS[args.format](res, findings), args.output)
+    out = RENDERERS[args.format](res, findings)
+    if args.for_agent:
+        from ai_auditor.reporting.agent_brief import build_brief, render_brief_markdown  # noqa: PLC0415
+
+        brief = build_brief(res, findings)
+        if args.format == "json":
+            import json  # noqa: PLC0415
+
+            data = json.loads(out)
+            data["agent_brief"] = brief
+            out = json.dumps(data, indent=2, ensure_ascii=False)
+        else:
+            out += render_brief_markdown(brief)
+    _write(out, args.output)
     if args.fail_on:
         from ai_auditor.analyzers.finding import EvidenceLevel
 
@@ -201,6 +220,9 @@ def build_parser() -> argparse.ArgumentParser:
         sp.add_argument("--config")
         sp.add_argument("--output", "-o")
         sp.add_argument("--no-cache", action="store_true")
+        sp.add_argument("--md-instructions", action="store_true",
+                        help="read every .md file (except README, CHANGELOG...) as agent instructions: "
+                             "a folder of playbooks or prompts exported from any tool")
 
     a = sub.add_parser("analyze", help="audit a project")
     common(a)
@@ -212,6 +234,9 @@ def build_parser() -> argparse.ArgumentParser:
     a.add_argument("--rules", help="comma-separated rule ids to run")
     a.add_argument("--fail-on", choices=["HYPOTHESIS", "LIKELY", "HIGH_CONFIDENCE", "PROVEN"],
                    help="exit 2 if a recommendation at or above this level exists (CI)")
+    a.add_argument("--for-agent", action="store_true",
+                   help="append a brief for the AI agent running the auditor: the steps the static analysis could "
+                        "not settle and a rubric to review them with its own judgement")
     a.set_defaults(func=cmd_analyze)
 
     i = sub.add_parser("ir", help="dump the intermediate representation")
