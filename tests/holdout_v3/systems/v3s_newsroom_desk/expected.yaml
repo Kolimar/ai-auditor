@@ -1,0 +1,56 @@
+fixture: v3s_newsroom_desk
+description: Mesa de redacción con 8 pasos LLM (Google GenAI y LiteLLM) para ingesta de agencias, borradores y verificación.
+labeled_by: holdout-v3 author A (Sonnet)
+expectations:
+  - id: E1
+    rule: LLM-009
+    component: extract_story_metadata
+    expect: present
+    rationale: >-
+      NewsML-G2 es XML con estructura estable; guid, urgencia, slugline, dateline y embargo son elementos conocidos.
+      Extraerlos es parseo de estructura legible por máquina (LLM-009).
+  - id: E2
+    rule: [LLM-011, LLM-002]
+    component: verify_article_record
+    expect: present
+    rationale: >-
+      Se pregunta al LLM si hay campos presentes, no vacíos y un entero positivo: comprobación de schema (LLM-011)
+      que resolvería pydantic o jsonschema.
+  - id: E3
+    rule: LLM-010
+    component: build_markdown_digest
+    expect: present
+    rationale: >-
+      Convierte una lista JSON a viñetas Markdown con una plantilla fija sin cambio semántico (JSON a tabla/Markdown,
+      rellenar una plantilla con campos ya disponibles, LLM-010).
+  - id: E4
+    rule: LLM-021
+    component: research_background
+    expect: present
+    rationale: >-
+      while True alrededor de una llamada LLM cuya única salida es una palabra clave generada por el modelo; no hay
+      cota de iteraciones ni espera a una persona (LLM-021).
+  - id: E5
+    rule: ANY
+    component: summarize_wire_story
+    expect: absent
+    rationale: Resumen de prosa con atribuciones que conservar; el resumen está explícitamente fuera de LLM-010.
+  - id: E6
+    rule: ANY
+    component: generate_headlines
+    expect: absent
+    rationale: Generación creativa con variedad deliberada de ángulos y temperatura alta; tarea abierta.
+  - id: E7
+    rule: ANY
+    component: fact_check_draft
+    expect: absent
+    rationale: >-
+      Fact-checking contra fuentes aportadas (grounding), validación semántica excluida de LLM-002; es lo que
+      ningún schema cubre.
+  - id: E8
+    rule: ANY
+    component: editor_chat
+    expect: absent
+    rationale: >-
+      REPL de chat cuyo loop espera a una persona con input(); excluido de LLM-021 ("cada vuelta espera a una
+      persona").

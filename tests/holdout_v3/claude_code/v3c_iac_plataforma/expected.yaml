@@ -1,0 +1,69 @@
+fixture: v3c_iac_plataforma
+description: Configuración Claude Code (en español) de un repo Terraform y Kubernetes, con agentes de revisión, investigación y despliegue.
+labeled_by: holdout-v3 author (claude_code A)
+expectations:
+  - id: E1
+    rule: LLM-011
+    component: validador-values
+    expect: present
+    rationale: Comprueba campos obligatorios, tipos, rangos y claves permitidas de YAML; es validación de schema (LLM-011).
+  - id: E2
+    rule: ANY
+    component: revisor-plan-terraform
+    expect: absent
+    rationale: Evaluación de riesgo con razonamiento sobre escenarios de fallo; opus con effort alto en dominio de riesgo.
+  - id: E3
+    rule: ANY
+    component: investigador-incidente
+    expect: absent
+    rationale: >-
+      Enumera comandos permitidos kubectl (allowlist, excluida de LLM-017) pero el trabajo es construir hipótesis y
+      descartarlas.
+  - id: E4
+    rule: LLM-012
+    component: orquestador-despliegue
+    expect: present
+    rationale: >-
+      Su único trabajo es reenviar la petición al subagente y devolver su respuesta sin cambios; intermediario sin
+      aportar aislamiento, paralelismo ni herramientas propias. Las del delegado no lo justifican.
+  - id: E5
+    rule: ANY
+    component: desplegador-staging
+    expect: absent
+    rationale: >-
+      Despliega y decide si revertir distinguiendo arranque lento de fallo real; requiere juicio y tiene herramientas
+      propias. Es el delegado, no el intermediario.
+  - id: E6
+    rule: LLM-023
+    component: auditor-cuentas
+    expect: present
+    rationale: Declara 28 herramientas mcp__ cuyos schemas se cargan en cada llamada, y la tarea usa solo dos.
+  - id: E7
+    rule: LLM-017
+    component: plan-entorno
+    expect: present
+    rationale: Secuencia fija de comandos ("A, luego B, por último C") que se lee como pasos, sin dependencia de la entrada.
+  - id: E8
+    rule: LLM-026
+    component: costo-mensual
+    expect: present
+    rationale: Multiplicaciones y sumas exactas sobre valores dados (precio * cantidad * 730), totales mensual y anual; lo hace el código.
+  - id: E9
+    rule: ANY
+    component: explicar-diff
+    expect: absent
+    rationale: El argumento es una referencia de git y el modelo debe interpretar el diff y valorar impacto; juicio abierto.
+  - id: E10
+    rule: ANY
+    component: runbook-migracion-estado
+    expect: absent
+    rationale: >-
+      Skill procedimental larga con herramientas que actúan, pero con decisiones en varios pasos y alto riesgo; la guardia
+      cc_procedure impide proponer reemplazos por código.
+  - id: E11
+    rule: LLM-004
+    component: CLAUDE.md
+    expect: present
+    rationale: >-
+      CLAUDE.md en la raíz de decenas de miles de caracteres (inventario de 60 módulos y 40 reglas) que se carga siempre
+      en cada sesión; instrucciones siempre cargadas desproporcionadas.

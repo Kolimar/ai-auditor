@@ -1,0 +1,50 @@
+fixture: v2s_talent_pipeline
+description: Embudo de contratación con webhook de ATS, cribado, ofertas, cartas de rechazo, planificador de entrevistas y reescore nocturno.
+labeled_by: holdout-v2 author (sistemas Python)
+expectations:
+  - id: E1
+    rule: LLM-009
+    component: normalize_ats_event
+    expect: present
+    rationale: >-
+      La entrada es el cuerpo JSON de un webhook con claves fijas; LLM-009 cubre extraer campos de JSON con estructura
+      legible por máquina. Basta con acceder a las claves.
+  - id: E2
+    rule: LLM-001
+    component: screen_candidate
+    expect: present
+    rationale: >-
+      Salida cerrada (ADVANCE/REJECT/HOLD) y criterios totalmente especificados como umbrales, pertenencia a lista y
+      contención de skills sobre campos estructurados (LLM-001, función computable).
+  - id: E3
+    rule: LLM-026
+    component: quote_offer_total
+    expect: present
+    rationale: >-
+      Suma de importes ya conocidos y un porcentaje; aritmética exacta que LLM-026 manda hacer en código con Decimal.
+  - id: E4
+    rule: ANY
+    component: summarize_resume_for_panel
+    expect: absent
+    rationale: >-
+      Resumen de un CV en prosa; el documento es el objeto de la tarea (exclusión de LLM-004) y resumir no se cubre por
+      ninguna regla de reemplazo.
+  - id: E5
+    rule: ANY
+    component: draft_decline_note
+    expect: absent
+    rationale: Redacción personalizada y empática de prosa abierta; tono y escritura son trabajo legítimo del LLM.
+  - id: E6
+    rule: ANY
+    component: interview_planner
+    expect: absent
+    rationale: >-
+      Agente que razona sobre rol y CV para proponer preguntas a medida; generación abierta con juicio, sin regla
+      aplicable.
+  - id: E7
+    rule: LLM-024
+    component: nightly_rescore
+    expect: present
+    rationale: >-
+      Script batch nocturno que recorre un CSV y llama de forma síncrona por fila; la latencia no importa, es el caso
+      de LLM-024.

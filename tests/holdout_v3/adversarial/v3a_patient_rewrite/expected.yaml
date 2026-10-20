@@ -1,0 +1,10 @@
+fixture: v3a_patient_rewrite
+description: Reescritura de notas de alta hospitalaria adaptada al público destinatario.
+labeled_by: holdout-v3 adversarial author
+expectations:
+  - id: E1
+    rule: ANY
+    component: adapt_discharge_note
+    expect: absent
+    rationale: >-
+      Reescritura de prosa con cambio de registro y explicación para una audiencia; es el caso excluido de LLM-010 (tono, claridad).

@@ -1,0 +1,49 @@
+fixture: v2c_data_pipeline
+description: Repositorio de ingeniería de datos (Airflow, dbt, BigQuery) con agentes de triage, parseo y utilidades mecánicas.
+labeled_by: holdout-v2 author (claude_code)
+expectations:
+  - id: E1
+    rule: [LLM-011, LLM-002]
+    component: schema-checker
+    expect: present
+    rationale: Se pide comprobar columnas requeridas, tipos, formatos y rangos de un CSV contra un contrato; es validación de schema (LLM-011), computable con código.
+  - id: E2
+    rule: LLM-009
+    component: airflow-log-parser
+    expect: present
+    rationale: Líneas de log con formato fijo; extraer campos es una regex. Cae en la definición de LLM-009 (líneas de log de formato fijo). Ya usa haiku, por lo que no aplica LLM-003.
+  - id: E3
+    rule: ANY
+    component: dq-triage
+    expect: absent
+    rationale: Investigación multi-paso con herramientas y consultas, dominio de diagnóstico con incertidumbre; LLM-000 aplica. Tiene herramientas que actúan y body largo.
+  - id: E4
+    rule: ANY
+    component: sql-migration-writer
+    expect: absent
+    rationale: Generación de código SQL con decisiones de diseño (particionado, incrementalidad); razonamiento complejo, opus justificado.
+  - id: E5
+    rule: LLM-026
+    component: scan-cost-estimator
+    expect: present
+    rationale: Cálculo exacto de coste (bytes*runs/TiB*precio, totales y porcentajes) sobre valores ya conocidos; definición de LLM-026.
+  - id: E6
+    rule: ANY
+    component: dbt-model-review
+    expect: absent
+    rationale: Skill procedural que requiere juicio sobre cardinalidad de joins y riesgo; no es secuencia fija de comandos.
+  - id: E7
+    rule: LLM-017
+    component: backfill-partition
+    expect: present
+    rationale: Cuatro comandos fijos en orden, parametrizados solo por una fecha; ejecutables por un script, no dependen del contenido.
+  - id: E8
+    rule: ANY
+    component: explain-lineage
+    expect: absent
+    rationale: Argumento rellenado por el modelo/usuario, traza linaje leyendo SQL e interpreta cambios de significado; búsqueda abierta.
+  - id: E9
+    rule: LLM-010
+    component: csv-to-doc
+    expect: present
+    rationale: CSV a tabla Markdown sin cambio semántico; ejemplo literal de LLM-010 (JSON/CSV a tabla Markdown).

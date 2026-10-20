@@ -1,0 +1,61 @@
+fixture: v2s_incident_desk
+description: Gestión de incidentes DevOps con alertas, enrutado, runbooks, clasificación, investigación agéntica y postmortems.
+labeled_by: holdout-v2 author (sistemas Python)
+expectations:
+  - id: E1
+    rule: LLM-009
+    component: parse_alert_line
+    expect: present
+    rationale: >-
+      Línea de log de formato fijo con pares clave=valor del log shipper; LLM-009 lista explícitamente líneas de log de
+      formato fijo como entrada legible por máquina.
+  - id: E2
+    rule: LLM-001
+    component: route_alert
+    expect: present
+    rationale: >-
+      Umbrales numéricos y pertenencia a un conjunto sobre entradas estructuradas, con cuatro salidas cerradas;
+      además usa un modelo grande (Opus) para ello. Función de decisión computable (LLM-001).
+  - id: E3
+    rule: [LLM-002, LLM-011]
+    component: verify_runbook_shape
+    expect: present
+    rationale: >-
+      Pide al LLM comprobar tipos y campos requeridos de un objeto que ya viene de salida estructurada validada por
+      pydantic (generate_runbook usa parse con Runbook); redundante con ese mecanismo (LLM-002) y es trabajo de schema
+      (LLM-011).
+  - id: E4
+    rule: [LLM-008, LLM-022]
+    component: classify_incident_type
+    expect: present
+    rationale: >-
+      Se parsea con json.loads texto libre del modelo sin structured outputs y se reintenta hasta 5 veces cuando falla
+      el parseo (LLM-022 y LLM-008).
+  - id: E5
+    rule: ANY
+    component: compose_status_update
+    expect: absent
+    rationale: >-
+      Redacción de comunicación para clientes; el decorador tenacity reintenta solo por RateLimit y errores de conexión,
+      que LLM-008 excluye como resiliencia legítima.
+  - id: E6
+    rule: ANY
+    component: diagnose_root_cause
+    expect: absent
+    rationale: >-
+      Loop agéntico con herramientas cuya elección depende de los hallazgos, acotado a 12 iteraciones (no es LLM-021)
+      y razonamiento multi-paso en dominio de riesgo (exclusión de LLM-003).
+  - id: E7
+    rule: ANY
+    component: draft_postmortem
+    expect: absent
+    rationale: >-
+      Generación larga y abierta que sintetiza timeline y logs; el documento es el objeto de la tarea y requiere
+      razonamiento (exclusiones de LLM-003 y LLM-004).
+  - id: E8
+    rule: ANY
+    component: generate_runbook
+    expect: absent
+    rationale: >-
+      Generación de procedimientos con razonamiento sobre arquitectura; ya usa salida estructurada (no es LLM-022) y
+      no hay regla aplicable.

@@ -1,0 +1,12 @@
+fixture: a03_clinical_risk
+description: Triage clinico con modelo pequeno ya en uso.
+labeled_by: red-team
+expectations:
+  - id: E1
+    rule: ANY
+    component: classify_symptom_risk
+    expect: absent
+    rationale: >-
+      Riesgo clinico sobre lenguaje indirecto: juicio semantico, no regla (LLM-001 "No es"). Ya usa modelo pequeno
+      (LLM-018 no aplica: el modelo actual ya es pequeno) y es dominio de alto riesgo (LLM-003 "No es").
+      Recomendar sustituir por reglas o recortar seria peligroso.

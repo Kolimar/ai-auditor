@@ -1,0 +1,9 @@
+fixture: v3a_h_bookshop_intent
+description: Detección de intención de mensajes de clientes de una librería online.
+labeled_by: holdout-v3 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-004
+    component: detect_intent
+    expect: present
+    rationale: Para decidir la intención de un único mensaje se vuelca el objeto completo del cliente, con todos los pedidos y el historial; el contexto no es el objeto de la tarea.

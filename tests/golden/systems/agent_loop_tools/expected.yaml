@@ -1,0 +1,39 @@
+fixture: agent_loop_tools
+description: Agente de soporte con Anthropic SDK y tools; loop sin límite, 27 tools, tool_choice forzado y llamadas independientes secuenciales.
+labeled_by: golden-author-1
+expectations:
+  - id: E1
+    rule: LLM-021
+    component: run_support_agent
+    expect: present
+    rationale: "`while True` sin contador ni cota de iteraciones alrededor de messages.create; solo sale si stop_reason != tool_use."
+  - id: E2
+    rule: LLM-023
+    component: run_support_agent
+    expect: present
+    rationale: Se envían 27 definiciones de tools en cada iteración del loop cuando un ticket típico usa unas pocas.
+  - id: E3
+    rule: LLM-017
+    component: run_support_agent
+    expect: absent
+    rationale: La elección de tool depende del contenido del ticket y de resultados previos; no es una llamada invariante.
+  - id: E4
+    rule: LLM-017
+    component: lookup_order_status
+    expect: present
+    rationale: tool_choice forzado a get_order con el order_id ya conocido; la llamada puede hacerse en código directamente.
+  - id: E5
+    rule: LLM-025
+    component: gather_account_context
+    expect: present
+    rationale: Tres resúmenes LLM secuenciales (pedidos, tickets, facturas) sin dependencia de datos entre ellos; paralelizables.
+  - id: E6
+    rule: ANY
+    component: plan_resolution
+    expect: absent
+    rationale: Razonamiento multi-paso sobre combinaciones de políticas en conflicto con extended thinking justificado; el resultado se consume.
+  - id: E7
+    rule: ANY
+    component: compose_customer_message
+    expect: absent
+    rationale: Redacción empática dirigida al cliente; generación abierta.

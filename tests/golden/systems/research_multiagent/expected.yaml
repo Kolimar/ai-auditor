@@ -1,0 +1,41 @@
+fixture: research_multiagent
+description: Sistema multi-agente con OpenAI Agents SDK; subagentes paralelos justificados más un orquestador pass-through y un formateador de citas.
+labeled_by: golden-author-1
+expectations:
+  - id: E1
+    rule: [LLM-012, LLM-006]
+    component: research_orchestrator
+    expect: present
+    rationale: >-
+      Su único trabajo es invocar a research_lead con la petición tal cual y devolver su respuesta sin cambios;
+      no aporta paralelismo, herramientas, permisos ni modelo distintos (LLM-012 y agente pass-through de LLM-006).
+  - id: E2
+    rule: ANY
+    component: web_researcher
+    expect: absent
+    rationale: Subagente con herramienta distinta (búsqueda web) ejecutado en paralelo; delegación justificada (LLM-012 no aplica).
+  - id: E3
+    rule: ANY
+    component: paper_researcher
+    expect: absent
+    rationale: Herramienta propia (arXiv) y lectura de papers extensos que aísla contexto; paralelo con los demás.
+  - id: E4
+    rule: ANY
+    component: data_analyst
+    expect: absent
+    rationale: Acceso a SQL de solo lectura (permisos/herramientas distintos) y razonamiento cuantitativo.
+  - id: E5
+    rule: ANY
+    component: research_lead
+    expect: absent
+    rationale: Coordina tres especialistas en paralelo y concilia contradicciones; aporta razonamiento real, no es pass-through.
+  - id: E6
+    rule: ANY
+    component: report_writer
+    expect: absent
+    rationale: Redacción de un memo de decisión con argumentación; generación abierta con razonamiento.
+  - id: E7
+    rule: LLM-010
+    component: citation_formatter
+    expect: present
+    rationale: Reformatear referencias como citas APA 7 manteniendo orden y entradas; cambio de presentación sin cambio semántico.

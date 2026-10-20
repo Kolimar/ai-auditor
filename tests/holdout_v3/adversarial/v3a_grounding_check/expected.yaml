@@ -1,0 +1,15 @@
+fixture: v3a_grounding_check
+description: Resumen estructurado de prospectos farmacéuticos y verificación de fidelidad frente al texto original.
+labeled_by: holdout-v3 adversarial author
+expectations:
+  - id: E1
+    rule: [LLM-002, LLM-011]
+    component: check_against_source
+    expect: absent
+    rationale: >-
+      Comprueba fidelidad semántica del resumen frente a la fuente (grounding), no tipos ni formato; el schema pydantic no cubre eso. Exclusión explícita de LLM-002 y LLM-011.
+  - id: E2
+    rule: ANY
+    component: summarize_label
+    expect: absent
+    rationale: Resumen de un documento que es el objeto de la tarea, en dominio de alto riesgo; sin recomendación aplicable.

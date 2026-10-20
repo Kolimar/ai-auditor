@@ -1,0 +1,89 @@
+fixture: v3c_api_platform_gateway
+description: Plataforma de API publica (OpenAPI, gateway, SDKs) con agentes, skills y comandos de Claude Code.
+labeled_by: holdout-v3 author (Claude Code config, API platform)
+expectations:
+  - id: E1
+    rule: ANY
+    component: breaking-change-reviewer
+    expect: absent
+    rationale: Revision con juicio sobre compatibilidad de consumidores; leer politica y razonar sobre impacto.
+  - id: E2
+    rule: [LLM-011, LLM-001]
+    component: openapi-linter
+    expect: present
+    rationale: Seis reglas completamente explicitas sobre un documento estructurado (YAML); lint determinista computable por codigo.
+  - id: E3
+    rule: LLM-001
+    component: rate-limit-tier-router
+    expect: present
+    rationale: Eleccion entre cinco etiquetas con umbrales numericos y pertenencia, sobre JSON estructurado; funcion de decision completamente especificada.
+  - id: E4
+    rule: ANY
+    component: incident-investigator
+    expect: absent
+    rationale: Lista de comandos permitidos pero tarea de investigacion con hipotesis y esfuerzo alto.
+  - id: E5
+    rule: ANY
+    component: sdk-changelog-writer
+    expect: absent
+    rationale: Redaccion para desarrolladores con tono y reescritura.
+  - id: E6
+    rule: LLM-012
+    component: pr-triage-relay
+    expect: present
+    rationale: Intermediario cuyo unico trabajo es invocar breaking-change-reviewer con el mismo texto y devolver su respuesta; el delegado ya tiene herramientas y modelo propios.
+  - id: E7
+    rule: ANY
+    component: contract-test-fixer
+    expect: absent
+    rationale: Edita codigo pero decide que lado esta equivocado segun la intencion; juicio.
+  - id: E8
+    rule: ANY
+    component: api-release-orchestrator
+    expect: absent
+    rationale: Delegacion en paralelo de tres revisiones independientes con aislamiento de contexto; justificada por la exclusion de LLM-012.
+  - id: E9
+    rule: ANY
+    component: security-reviewer
+    expect: absent
+    rationale: Revision de seguridad de solo lectura con razonamiento sobre rutas de ataque.
+  - id: E10
+    rule: LLM-006
+    component: api-doc-writer
+    expect: present
+    rationale: Casi duplicado de endpoint-reference-writer (mismo rol, mismas herramientas, mismo modelo, texto reformulado); copias que divergen levemente.
+  - id: E11
+    rule: LLM-006
+    component: endpoint-reference-writer
+    expect: optional
+    rationale: Es el otro miembro del par duplicado; el auditor puede senalar solo uno de los dos y la recomendacion es quedarse con una version.
+  - id: E12
+    rule: LLM-010
+    component: generate-postman-collection
+    expect: present
+    rationale: Conversion mecanica de OpenAPI a coleccion Postman con tabla de mapeo explicita, sin cambio semantico.
+  - id: E13
+    rule: ANY
+    component: deprecation-notice-drafting
+    expect: absent
+    rationale: Redaccion de comunicaciones a clientes con tono; generacion abierta.
+  - id: E14
+    rule: LLM-009
+    component: parse-access-logs
+    expect: present
+    rationale: Extrae campos de lineas de log nginx de formato fijo y agrega; parseo de entrada con estructura legible por maquina.
+  - id: E15
+    rule: LLM-017
+    component: release-check
+    expect: present
+    rationale: Bloque de codigo con cuatro comandos fijos ejecutados en orden; secuencia invariante.
+  - id: E16
+    rule: ANY
+    component: triage-issue
+    expect: absent
+    rationale: Argumento rellenado por el modelo y clasificacion con interpretacion de texto libre y investigacion en el codigo.
+  - id: E17
+    rule: ANY
+    component: CLAUDE.md
+    expect: absent
+    rationale: Memoria raiz corta; el CLAUDE.md grande esta en services/gateway y solo se carga en ese subarbol.

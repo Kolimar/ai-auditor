@@ -1,0 +1,16 @@
+fixture: v2a_review_nightly
+description: Script nocturno que enriquece un volcado JSONL de reseñas con resúmenes, más una función interactiva.
+labeled_by: holdout-v2 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-024
+    component: etiquetar_resenas
+    expect: present
+    rationale: >-
+      Procesamiento masivo no interactivo (bucle sobre un archivo, ejecutado como script) con llamadas síncronas; la
+      latencia no importa y una Batch API aplicaría.
+  - id: E2
+    rule: LLM-024
+    component: respuesta_en_vivo
+    expect: absent
+    rationale: Llamada interactiva única por pregunta; no es procesamiento batch.

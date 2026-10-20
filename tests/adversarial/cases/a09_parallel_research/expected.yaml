@@ -1,0 +1,22 @@
+fixture: a09_parallel_research
+description: Tres agentes en paralelo con herramientas y modelos distintos.
+labeled_by: red-team
+expectations:
+  - id: E1
+    rule: [LLM-012, LLM-006, LLM-025]
+    component: news_researcher
+    expect: absent
+    rationale: >-
+      LLM-012 "No es: paralelismo real, herramientas distintas". LLM-025 no aplica, ya usa gather.
+  - id: E2
+    rule: [LLM-012, LLM-006, LLM-025]
+    component: filings_researcher
+    expect: absent
+    rationale: >-
+      Herramienta propia (SEC) y fuente de datos distinta; LLM-006 "No es: fuente de datos distinta".
+  - id: E3
+    rule: [LLM-012, LLM-006, LLM-025]
+    component: patent_researcher
+    expect: absent
+    rationale: >-
+      Herramienta y modelo distintos; no hay agentes casi duplicados.

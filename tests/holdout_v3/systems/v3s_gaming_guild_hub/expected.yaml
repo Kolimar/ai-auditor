@@ -1,0 +1,52 @@
+fixture: v3s_gaming_guild_hub
+description: Backend de comunidad para un shooter por equipos (moderacion, apelaciones, tienda, localizacion, resumenes y soporte) con LiteLLM.
+labeled_by: holdout_v3 author (sonnet), written against docs/RULES.md
+expectations:
+  - id: E1
+    rule: LLM-001
+    component: decide_ban_appeal
+    expect: present
+    rationale: >-
+      La salida es una de cuatro palabras y la tabla de politica enumera completamente las condiciones sobre campos estructurados (delito, strikes, antiguedad); funcion de decision computable por codigo.
+  - id: E2
+    rule: LLM-010
+    component: build_leaderboard_blurb
+    expect: present
+    rationale: >-
+      Convierte lineas CSV a una tabla Markdown sin cambio semantico, con un modelo grande; LLM-010 cita explicitamente la conversion a tabla Markdown.
+  - id: E3
+    rule: [LLM-020, LLM-014]
+    component: describe_item_rarity
+    expect: present
+    rationale: >-
+      La entrada es un valor de un enum de cinco rarezas conocidas, temperatura 0, y se llama en cada render de tienda por item; dominio finito pequeno, precomputable (LLM-020) y memoizable (LLM-014 b).
+  - id: E4
+    rule: LLM-025
+    component: localize_announcement
+    expect: present
+    rationale: >-
+      Cuatro llamadas de traduccion secuenciales en un bucle, cada una independiente de las demas (ninguna usa el resultado de otra); paralelizables segun LLM-025.
+  - id: E5
+    rule: ANY
+    component: moderate_chat_message
+    expect: absent
+    rationale: >-
+      Clasificacion de seguridad sobre lenguaje libre con ortografias disfrazadas; validacion semantica de seguridad y dominio de riesgo (exclusion de LLM-002/LLM-003). El tenacity solo reintenta RateLimitError y fallos de conexion: resiliencia legitima, exclusion de LLM-008.
+  - id: E6
+    rule: ANY
+    component: weekly_event_recap
+    expect: absent
+    rationale: >-
+      Generacion creativa abierta con temperatura alta y restricciones de estilo; LLM justificado (exclusion de LLM-003).
+  - id: E7
+    rule: ANY
+    component: suggest_team_comp
+    expect: absent
+    rationale: >-
+      Razonamiento estrategico multi-paso que se muestra al equipo con justificaciones; el razonamiento es el producto (exclusion de LLM-007).
+  - id: E8
+    rule: ANY
+    component: reply_to_support_ticket
+    expect: absent
+    rationale: >-
+      Respuesta abierta a texto libre del jugador con tono de marca y condicion de escalado dependiente del contenido; generacion conversacional justificada.

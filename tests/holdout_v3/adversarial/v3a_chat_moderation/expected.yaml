@@ -1,0 +1,10 @@
+fixture: v3a_chat_moderation
+description: Guardarraíl de moderación sobre mensajes de chat de un videojuego.
+labeled_by: holdout-v3 adversarial author
+expectations:
+  - id: E1
+    rule: ANY
+    component: moderate_message
+    expect: absent
+    rationale: >-
+      Moderación de seguridad sobre texto libre con matices (bromas entre amigos vs acoso); es validación semántica de seguridad y usa ya un modelo pequeño. Exclusiones de LLM-001, LLM-002 y LLM-018.

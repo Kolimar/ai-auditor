@@ -1,0 +1,10 @@
+fixture: b04_schema_check_paraphrase
+description: Validacion de schema por LLM sin la palabra schema.
+labeled_by: red-team
+expectations:
+  - id: E1
+    rule: LLM-011
+    component: check_records
+    expect: present
+    rationale: >-
+      LLM-011 "Es": comprobar campos requeridos, tipos y formato de fecha. No hay semantica: pydantic lo resolveria.

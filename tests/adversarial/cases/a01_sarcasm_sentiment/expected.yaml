@@ -1,0 +1,13 @@
+fixture: a01_sarcasm_sentiment
+description: Clasificacion de sentimiento con sarcasmo en modelo grande.
+labeled_by: red-team
+expectations:
+  - id: E1
+    rule: [LLM-001, LLM-003, LLM-009, LLM-010]
+    component: classify_review_sentiment
+    expect: absent
+    rationale: >-
+      Aunque dice "clasifica" y la salida es cerrada, la polaridad depende de interpretar ironia en texto libre.
+      LLM-001 no es (no hay reglas explicitas sobre entradas estructuradas; es "clasificacion semantica"),
+      LLM-009 excluye prosa libre. LLM-003 se excluye en lo posible por la dificultad de sarcasmo; LLM-018 seria
+      el maximo aceptable (no listado aqui).

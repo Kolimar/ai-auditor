@@ -1,0 +1,71 @@
+fixture: v3s_travel_booking_concierge
+description: Concierge de reservas de viaje con agentes (OpenAI Agents SDK, pydantic-ai, OpenAI responses), prompts mezclando inglés y español.
+labeled_by: holdout-v3 author A (Sonnet)
+expectations:
+  - id: E1
+    rule: LLM-012
+    component: BookingFrontDesk
+    expect: present
+    rationale: >-
+      Agente sin herramientas cuyo único trabajo es pasar la petición al especialista de vuelos "tal cual". Las
+      herramientas del delegado lo justifican a él, no al intermediario que solo reenvía (definición de LLM-012).
+  - id: E2
+    rule: ANY
+    component: FlightsSpecialist
+    expect: absent
+    rationale: >-
+      Agente con herramientas propias (búsqueda y bloqueo de asiento) que compara opciones según la petición;
+      las herramientas del delegado lo justifican (exclusión de LLM-012). max_turns acotado en el llamador.
+  - id: E3
+    rule: ANY
+    component: ItineraryWriter
+    expect: absent
+    rationale: Generación abierta larga de itinerario con recomendaciones; uso legítimo del LLM.
+  - id: E4
+    rule: ANY
+    component: ComplaintResponder
+    expect: absent
+    rationale: >-
+      Respuesta empática a texto libre de un cliente; redacción de prosa, fuera de LLM-010 y LLM-001.
+  - id: E5
+    rule: LLM-001
+    component: refund_decider
+    expect: present
+    rationale: >-
+      Salida en un conjunto cerrado (full/partial/no refund) decidida por clase tarifaria, días y canal con umbrales
+      y orden de prioridad explícitos sobre entradas estructuradas; función computable por código (LLM-001).
+  - id: E6
+    rule: LLM-009
+    component: passport_extractor
+    expect: present
+    rationale: >-
+      Las dos líneas MRZ ICAO 9303 tienen posiciones fijas y formato regular (fechas, número, nacionalidad); extraer
+      campos es parseo determinista (LLM-009: fechas/IDs con formato regular).
+  - id: E7
+    rule: ANY
+    component: trip_risk_assessor
+    expect: absent
+    rationale: >-
+      Interpreta avisos y noticias en lenguaje natural distinguiendo rumor de hecho confirmado; dominio de riesgo y
+      comprensión de texto libre variable; no encaja en las definiciones de LLM-009 ni LLM-018 (no es etiquetado cerrado).
+  - id: E8
+    rule: [LLM-018, LLM-003]
+    component: review_tagger
+    expect: optional
+    rationale: >-
+      Etiquetado de sentimiento con modelo gpt-4o: encaja con LLM-018 en teoría, pero no se indica volumen ni
+      que la tarea sea estrecha en producción; caso límite aceptado en ambos sentidos.
+  - id: E9
+    rule: LLM-026
+    component: quote_total
+    expect: present
+    rationale: >-
+      Se pide al LLM calcular noches por tarifa, impuesto porcentual y tasa fija sobre valores conocidos; aritmética
+      exacta que el código haría sin error (LLM-026).
+  - id: E10
+    rule: ANY
+    component: HotelsSpecialist
+    expect: absent
+    rationale: >-
+      Agente con herramienta propia (search_hotels) y preferencias de barrio en lenguaje natural; el delegado se
+      justifica por su herramienta (exclusión de LLM-012).

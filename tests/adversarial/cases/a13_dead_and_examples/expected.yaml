@@ -1,0 +1,18 @@
+fixture: a13_dead_and_examples
+description: Llamadas LLM smelly en codigo inalcanzable y en examples/.
+labeled_by: red-team
+expectations:
+  - id: E1
+    rule: [LLM-009, LLM-022]
+    component: legacy_extract
+    expect: absent
+    rationale: >-
+      La llamada esta bajo "if False:" y es inalcanzable: no es un paso LLM ejecutable (RULES: unidad de analisis es
+      una llamada a un modelo en el sistema). Recomendar optimizarla es ruido, no un ahorro real. Decision: absent.
+  - id: E2
+    rule: [LLM-009]
+    component: demo_parse_csv_row
+    expect: optional
+    rationale: >-
+      Ejemplo/tutorial en examples/ con estructura CSV: seria LLM-009 si fuera produccion, pero no forma parte del
+      sistema desplegado. Caso limite: se acepta emitirlo o no.

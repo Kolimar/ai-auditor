@@ -1,0 +1,9 @@
+fixture: v3a_h_pedidos_check
+description: Revisión de ficheros JSON de pedidos de una plataforma de entradas.
+labeled_by: holdout-v3 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-011
+    component: revisar_archivo_pedidos
+    expect: present
+    rationale: Se pide al LLM comprobar tipos, formatos, rangos y pertenencia a una lista cerrada sobre JSON; es validación de schema, no semántica. Prompt en español.

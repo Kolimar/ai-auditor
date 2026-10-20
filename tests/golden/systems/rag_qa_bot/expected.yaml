@@ -1,0 +1,48 @@
+fixture: rag_qa_bot
+description: Bot de preguntas sobre un handbook interno con LangChain + Chroma; 6 funciones con LLM.
+labeled_by: golden-author-1
+expectations:
+  - id: E1
+    rule: ANY
+    component: rewrite_query
+    expect: absent
+    rationale: Reescritura de la pregunta resolviendo referencias del historial; comprensión de lenguaje, ya usa modelo pequeño.
+  - id: E2
+    rule: ANY
+    component: grade_passages
+    expect: absent
+    rationale: >-
+      Juicio semántico de relevancia (mismo producto y versión) sobre cada pasaje con un modelo pequeño; no es decisión
+      por reglas y el tier ya es adecuado. Es el reranking que mitiga LLM-016.
+  - id: E3
+    rule: ANY
+    component: answer_question
+    expect: absent
+    rationale: >-
+      Respuesta final con k=6, pasajes reducidos por grading y citas; generación fundamentada legítima.
+      Recuperación acotada, no excesiva.
+  - id: E4
+    rule: LLM-016
+    component: answer_broad_question
+    expect: present
+    min_level: LIKELY
+    rationale: top_k=40 sin reranking y lectura de los documentos completos del disco para inyectarlos en el prompt.
+  - id: E5
+    rule: LLM-004
+    component: answer_broad_question
+    expect: optional
+    rationale: Documentos completos como contexto de una pregunta de política; solapa con LLM-016, caso límite.
+  - id: E6
+    rule: LLM-015
+    component: answer_with_subquestions
+    expect: present
+    rationale: >-
+      Dentro del for, similarity_search(question, k=8) usa la misma consulta (question, no sub) en cada iteración;
+      misma recuperación repetida sin reutilizar el resultado.
+  - id: E7
+    rule: [LLM-006, LLM-007, LLM-003]
+    component: condense_answer
+    expect: present
+    rationale: >-
+      Resume en tres frases la respuesta que el paso anterior ya produjo ("resume el resumen"): rehace el trabajo del
+      paso previo (LLM-006), con modelo grande para una tarea corta.

@@ -1,0 +1,49 @@
+fixture: v2c_webshop
+description: Repositorio de tienda online (Next.js + Express + Prisma) con agentes de revisión, depuración y tareas mecánicas.
+labeled_by: holdout-v2 author (claude_code)
+expectations:
+  - id: E1
+    rule: ANY
+    component: pr-reviewer
+    expect: absent
+    rationale: Revisión de código sobre un diff (objeto de la tarea), razonamiento multi-paso y modelo grande justificado; LLM-003 excluye razonamiento multi-paso y LLM-000 aplica.
+  - id: E2
+    rule: LLM-003
+    component: lint-fixer
+    expect: present
+    rationale: Ejecuta eslint --fix y prettier; tarea mecánica y acotada con modelo opus. Es un modelo frontier en una tarea simple de formateo.
+  - id: E3
+    rule: ANY
+    component: bug-investigator
+    expect: absent
+    rationale: El cuerpo lista comandos permitidos pero el trabajo es investigar la causa raíz con hipótesis; razonamiento multi-paso, sonnet es adecuado. Look-alike de LLM-017 (allowlist).
+  - id: E4
+    rule: [LLM-010, LLM-003]
+    component: commit-table-writer
+    expect: present
+    rationale: Convierte JSON a tabla Markdown con formato de fecha, sin cambio semántico; es la definición de LLM-010 (JSON a tabla Markdown, formato de fechas).
+  - id: E5
+    rule: LLM-017
+    component: release-checklist
+    expect: present
+    rationale: Secuencia fija de ocho comandos que se leen como pasos, siempre en el mismo orden; la definición de LLM-017 (secuencias fijas) y puede ser un script.
+  - id: E6
+    rule: ANY
+    component: api-design-review
+    expect: absent
+    rationale: Skill procedural larga que exige juicio (compatibilidad, modos de fallo); no hay comandos fijos ni tarea mecánica.
+  - id: E7
+    rule: ANY
+    component: test-failures
+    expect: absent
+    rationale: El comando ejecuta un único test con argumento dado por el usuario y pide explicar fallos leyendo código; interpretación abierta.
+  - id: E8
+    rule: LLM-017
+    component: deploy-staging
+    expect: present
+    rationale: Secuencia fija de comandos de despliegue sin dependencia del contenido de la entrada; ejecutable por un script.
+  - id: E9
+    rule: ANY
+    component: CLAUDE.md
+    expect: absent
+    rationale: CLAUDE.md breve y proporcionado (menos de diez líneas); LLM-004 no aplica.

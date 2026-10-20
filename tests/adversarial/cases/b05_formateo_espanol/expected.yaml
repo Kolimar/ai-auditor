@@ -1,0 +1,10 @@
+fixture: b05_formateo_espanol
+description: Formateo determinista pedido en espanol.
+labeled_by: red-team
+expectations:
+  - id: E1
+    rule: LLM-010
+    component: normalizar_listado
+    expect: present
+    rationale: >-
+      LLM-010 "Es": transformar presentacion (tabla Markdown, mayusculas, formato de fecha) sin cambio semantico.

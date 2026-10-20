@@ -1,0 +1,69 @@
+fixture: v3c_thesis_latex
+description: Tesis doctoral en LaTeX con configuracion Claude Code para revision, bibliografia y compilacion.
+labeled_by: holdout-v3 author (Claude Code config, academic thesis)
+expectations:
+  - id: E1
+    rule: ANY
+    component: argument-critic
+    expect: absent
+    rationale: Critica de argumentos con juicio, solo lectura, esfuerzo alto; modelo inherit.
+  - id: E2
+    rule: LLM-010
+    component: bibtex-normalizer
+    expect: present
+    rationale: Reglas de renombrado y reordenacion de campos completamente mecanicas sobre BibTeX; el modelo es opus y el cuerpo describe una transformacion acotada de ficheros pese a Edit.
+  - id: E3
+    rule: LLM-009
+    component: log-error-extractor
+    expect: present
+    rationale: Extrae mensajes y numeros de linea de un log LaTeX de formato fijo (lineas con ! y l.<n>); entrada legible por maquina.
+  - id: E4
+    rule: ANY
+    component: literature-gap-finder
+    expect: absent
+    rationale: Busqueda web y juicio de relevancia con herramientas de investigacion; razonamiento abierto.
+  - id: E5
+    rule: ANY
+    component: proofreader
+    expect: absent
+    rationale: Correccion de prosa (reescritura de claridad, no formateo) con un modelo pequeno ya adecuado.
+  - id: E6
+    rule: ANY
+    component: thesis-orchestrator
+    expect: absent
+    rationale: Delegacion en paralelo con aislamiento de contexto (un capitulo por subagente) y consolidacion entre capitulos; exclusion de LLM-012.
+  - id: E7
+    rule: ANY
+    component: abstract-translator
+    expect: absent
+    rationale: Traduccion con registro tecnico; la traduccion es explicitamente una exclusion de LLM-010.
+  - id: E8
+    rule: LLM-017
+    component: build-thesis
+    expect: present
+    rationale: Cinco comandos fijos numerados (latexmk, biber, latexmk, pdfinfo, cp) que se leen como pasos; secuencia invariante.
+  - id: E9
+    rule: ANY
+    component: thesis-defense-prep
+    expect: absent
+    rationale: Procedimiento largo de preparacion con juicio sobre la tesis; nada mecanico.
+  - id: E10
+    rule: LLM-010
+    component: table-from-csv
+    expect: present
+    rationale: Convierte CSV en tabla LaTeX con plantilla fija y sin cambio semantico.
+  - id: E11
+    rule: LLM-026
+    component: deadline-check
+    expect: present
+    rationale: Diferencia de fechas exacta en dias/semanas y cociente sobre valores conocidos; calculo en codigo.
+  - id: E12
+    rule: ANY
+    component: next-chapter-outline
+    expect: absent
+    rationale: Esquema de capitulo con argumento rellenado por el modelo; generacion creativa con criterio.
+  - id: E13
+    rule: ANY
+    component: CLAUDE.md
+    expect: absent
+    rationale: Memoria raiz minima. AGENTS.md es extenso pero lo leen otros agentes, no Claude Code (exclusion de LLM-004); chapters/CLAUDE.md es anidado.

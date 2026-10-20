@@ -1,0 +1,14 @@
+fixture: v3a_h_shelf_tags
+description: Etiquetado de libros por estantería en una librería, con modelo tomado del entorno.
+labeled_by: holdout-v3 adversarial author
+expectations:
+  - id: E1
+    rule: [LLM-003, LLM-018]
+    component: tag_genre
+    expect: present
+    rationale: Clasificación de salida corta y cerrada sobre texto breve, con un modelo de tier grande (por defecto del entorno); tarea simple, candidata a modelo pequeño.
+  - id: E2
+    rule: [LLM-020, LLM-014]
+    component: shelf_sign_text
+    expect: present
+    rationale: La entrada proviene de un enum finito y pequeño conocido de antemano; el texto del cartel puede precalcularse una vez por categoría.

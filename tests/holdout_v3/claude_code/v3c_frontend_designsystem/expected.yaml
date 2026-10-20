@@ -1,0 +1,61 @@
+fixture: v3c_frontend_designsystem
+description: Monorepo de un design system React (tokens, componentes, docs) con agentes, skills y comandos de Claude Code.
+labeled_by: holdout-v3 author (Claude Code config, frontend)
+expectations:
+  - id: E1
+    rule: LLM-010
+    component: token-json-to-css
+    expect: present
+    rationale: >-
+      Transformacion mecanica de JSON a CSS/SCSS con regla de mapeo explicita y sin cambio semantico; el agente usa opus y aun con Write el cuerpo describe una transformacion de ficheros acotada.
+  - id: E2
+    rule: ANY
+    component: a11y-reviewer
+    expect: absent
+    rationale: Revision de accesibilidad con juicio, herramientas de solo lectura y esfuerzo alto; el LLM esta justificado.
+  - id: E3
+    rule: ANY
+    component: component-scaffolder
+    expect: absent
+    rationale: Aunque edita ficheros, debe estudiar convenciones y decidir diseno de API; no es transformacion mecanica.
+  - id: E4
+    rule: ANY
+    component: release-notes-writer
+    expect: absent
+    rationale: Redaccion abierta de prosa con tono; reescritura, no formateo.
+  - id: E5
+    rule: LLM-012
+    component: design-review-coordinator
+    expect: present
+    rationale: >-
+      Intermediario cuyo unico trabajo es reenviar la peticion sin cambios a otro subagente y devolver la respuesta tal cual; las herramientas del delegado no justifican al intermediario.
+  - id: E6
+    rule: ANY
+    component: docs-example-checker
+    expect: absent
+    rationale: Lista de comandos permitidos (allowlist) en el cuerpo, pero la tarea es investigar causas raiz; no es una secuencia fija de pasos.
+  - id: E7
+    rule: LLM-011
+    component: changeset-validator
+    expect: present
+    rationale: Comprobacion de campos requeridos, valores enumerados y tipos sobre ficheros de frontmatter; trabajo de schema sin juicio semantico.
+  - id: E8
+    rule: ANY
+    component: visual-regression-triage
+    expect: absent
+    rationale: Procedimiento largo que requiere juicio (clasificar diffs, explicar mecanismos); cuerpo > 600 tokens con herramientas que actuan.
+  - id: E9
+    rule: LLM-017
+    component: bundle-size
+    expect: present
+    rationale: Secuencia fija "A, luego B, luego C" de comandos en linea que se leen como pasos; las llamadas pueden hacerse en codigo.
+  - id: E10
+    rule: ANY
+    component: review-component
+    expect: absent
+    rationale: Argumento rellenado por el modelo y revision de diseno abierta con criterio.
+  - id: E11
+    rule: LLM-004
+    component: CLAUDE.md
+    expect: present
+    rationale: Memoria raiz siempre cargada y desproporcionada (secciones por componente de 40 componentes) para casi cualquier tarea; el CLAUDE.md anidado de icons no cuenta.

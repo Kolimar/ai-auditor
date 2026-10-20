@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "aws": {
+      "command": "npx",
+      "args": ["-y", "@example/aws-mcp-server"],
+      "env": { "AWS_PROFILE": "plataforma-readonly" }
+    },
+    "kubernetes": {
+      "command": "npx",
+      "args": ["-y", "@example/k8s-mcp-server", "--readonly"]
+    }
+  }
+}

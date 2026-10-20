@@ -1,0 +1,14 @@
+fixture: v3a_h_sensor_advice
+description: Recomendaciones de riego a partir de lecturas de sensores agrícolas.
+labeled_by: holdout-v3 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-008
+    component: recommend_irrigation
+    expect: present
+    rationale: Reintenta la llamada cuando falla el parseo o la validación del formato, sin structured outputs que lo evitarían.
+  - id: E2
+    rule: LLM-022
+    component: recommend_irrigation
+    expect: present
+    rationale: Recorta el texto libre y lo pasa a json.loads sin salida estructurada ni decodificación restringida.

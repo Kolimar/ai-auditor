@@ -1,0 +1,12 @@
+fixture: a14_moderation_guardrail
+description: LLM como guardarrail de seguridad.
+labeled_by: red-team
+expectations:
+  - id: E1
+    rule: ANY
+    component: screen_user_message
+    expect: absent
+    rationale: >-
+      Salida binaria y temperatura 0 (parece LLM-003/LLM-014), pero LLM-002 "No es: seguridad" y LLM-003 "No es:
+      alto riesgo sin evidencia runtime". Intencion adversarial variable; quitarlo o bajar de modelo aumenta riesgo.
+      Cachear (LLM-014) es inviable: entradas no finitas.

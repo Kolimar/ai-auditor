@@ -1,0 +1,56 @@
+fixture: v2s_pocket_ledger
+description: Finanzas personales; importación de extractos, categorización, totales, explicaciones y consejos (pydantic-ai y OpenAI chat).
+labeled_by: holdout-v2 author (sistemas Python)
+expectations:
+  - id: E1
+    rule: [LLM-018, LLM-003]
+    component: categorizer
+    expect: present
+    rationale: >-
+      El memo bancario es texto libre pero la salida es una de 8 categorías; tarea estrecha de clasificación con
+      gpt-4o, candidata a modelo pequeño (LLM-018) / modelo grande en tarea simple (LLM-003).
+  - id: E2
+    rule: LLM-009
+    component: import_csv_row
+    expect: present
+    rationale: >-
+      Fila de CSV con columnas fijas (fecha, importe, descripción, divisa); LLM-009 incluye CSV como entrada con
+      estructura legible por máquina.
+  - id: E3
+    rule: LLM-010
+    component: normalize_statement_dates
+    expect: present
+    rationale: >-
+      Reformatea fechas y pone en mayúsculas un campo sin tocar el resto; transformación de presentación sin cambio
+      semántico (LLM-010).
+  - id: E4
+    rule: LLM-026
+    component: monthly_totals
+    expect: present
+    rationale: >-
+      Sumas por categoría y conversión de divisa con una tasa dada sobre importes ya conocidos; aritmética exacta
+      (LLM-026), a hacer con Decimal.
+  - id: E5
+    rule: ANY
+    component: explain_variance
+    expect: absent
+    rationale: >-
+      Las diferencias se calculan en código con Decimal y el LLM solo explica; exclusión explícita de LLM-026
+      ("pedirle al LLM que explique un cálculo hecho en código").
+  - id: E6
+    rule: ANY
+    component: budget_advice
+    expect: absent
+    rationale: >-
+      Consejo abierto y personalizado con juicio. El reintento tenacity cubre solo RateLimitError, resiliencia legítima
+      excluida de LLM-008.
+  - id: E7
+    rule: ANY
+    component: ask_my_finances
+    expect: absent
+    rationale: Recuperación con n_results=3 (pequeño) y respuesta anclada a los extractos; fuera de LLM-016.
+  - id: E8
+    rule: ANY
+    component: tax_notes_summary
+    expect: absent
+    rationale: Resumen y agrupación temática de notas libres con modelo pequeño; resumir está excluido de LLM-010.

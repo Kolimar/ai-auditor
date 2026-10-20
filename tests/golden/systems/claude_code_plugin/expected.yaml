@@ -1,0 +1,60 @@
+fixture: claude_code_plugin
+description: Proyecto con configuración Claude Code (agentes, skills, comando, CLAUDE.md grande, .mcp.json).
+labeled_by: golden-author-1
+expectations:
+  - id: E1
+    rule: LLM-003
+    component: test-runner
+    expect: present
+    rationale: >-
+      Subagente con model opus que solo ejecuta git status, pytest y echo $?, y reporta; tarea simple, salida corta,
+      sin razonamiento multi-paso. LLM-003.
+  - id: E2
+    rule: LLM-017
+    component: test-runner
+    expect: optional
+    rationale: Secuencia fija de comandos invariante (candidata a script/hook), pero se acepta que se reporte solo como LLM-003.
+  - id: E3
+    rule: LLM-006
+    component: pr-reviewer
+    expect: present
+    rationale: >-
+      Mismo rol, herramientas, modelo y casi el mismo prompt que code-reviewer (solo cambia "change" por "pull request");
+      agentes casi duplicados.
+  - id: E4
+    rule: LLM-006
+    component: code-reviewer
+    expect: optional
+    rationale: Es la otra mitad del par duplicado; el auditor puede señalar uno o ambos.
+  - id: E5
+    rule: ANY
+    component: architecture-reviewer
+    expect: absent
+    rationale: Razonamiento multi-paso sobre dependencias, modos de fallo y carga; opus justificado y sin herramientas de ejecución.
+  - id: E6
+    rule: ANY
+    component: security-auditor
+    expect: absent
+    rationale: Auditoría de seguridad de alto riesgo con razonamiento sobre flujos; el modelo grande está justificado.
+  - id: E7
+    rule: LLM-010
+    component: json-to-yaml
+    expect: present
+    rationale: Skill que convierte JSON a YAML sin cambiar valores; ejemplo literal de LLM-010 (mejor un script o yq).
+  - id: E8
+    rule: ANY
+    component: release-notes-writer
+    expect: absent
+    rationale: Redacción de notas orientadas al usuario traduciendo jerga; reescritura de prosa con tono, excluida de LLM-010.
+  - id: E9
+    rule: LLM-004
+    component: CLAUDE.md
+    expect: present
+    rationale: >-
+      CLAUDE.md de decenas de KB siempre cargado, con notas por módulo (20 módulos), pasos de release y reglas de estilo
+      que casi ninguna tarea necesita; instrucciones siempre cargadas desproporcionadas.
+  - id: E10
+    rule: ANY
+    component: triage-bug
+    expect: absent
+    rationale: Comando de triaje que pide hipótesis y razonamiento sobre causa raíz; trabajo abierto, no determinista.

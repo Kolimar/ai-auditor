@@ -1,0 +1,14 @@
+fixture: v2a_policy_advisor
+description: Asistente de políticas de RRHH con manual grande en el system prompt ya cacheado.
+labeled_by: holdout-v2 adversarial author
+expectations:
+  - id: E1
+    rule: [LLM-014, LLM-005]
+    component: answer_policy_question
+    expect: absent
+    rationale: El prefijo grande y estable ya usa cache_control; excluido de LLM-005 y LLM-014.
+  - id: E2
+    rule: [LLM-014, LLM-005]
+    component: answer_followup
+    expect: absent
+    rationale: Mismo prefijo con cache_control explícito; el contexto repetido ya está cacheado.

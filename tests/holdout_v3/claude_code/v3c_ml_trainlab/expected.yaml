@@ -1,0 +1,69 @@
+fixture: v3c_ml_trainlab
+description: Configuración Claude Code de un repo de entrenamiento de modelos con parseo de logs, puertas de promoción y diagnóstico.
+labeled_by: holdout-v3 author (claude_code A)
+expectations:
+  - id: E1
+    rule: LLM-009
+    component: train-log-parser
+    expect: present
+    rationale: >-
+      Las líneas de log tienen formato fijo con claves key=value; extraer campos es un regex, no comprensión de lenguaje.
+      Tiene Bash pero la tarea es mecánica y acotada.
+  - id: E2
+    rule: LLM-001
+    component: checkpoint-gate
+    expect: present
+    rationale: >-
+      Elige entre PROMOTE/HOLD/REJECT con umbrales numéricos y comparaciones sobre JSON estructurado; función de decisión
+      completamente especificada y computable.
+  - id: E3
+    rule: LLM-026
+    component: gpu-cost-totaler
+    expect: present
+    rationale: Multiplicaciones y sumas exactas sobre un CSV conocido, con redondeo a céntimos; cálculo que el código hace sin error.
+  - id: E4
+    rule: [LLM-020, LLM-003]
+    component: class-glossary-generator
+    expect: present
+    rationale: >-
+      Entradas estáticas (las diez clases fijas de CIFAR-10, sin variables) y salida corta; se calcula una vez offline.
+      Sin variables runtime es precomputación (LLM-020); el modelo sonnet para una tarea mínima también cuenta como LLM-003.
+  - id: E5
+    rule: ANY
+    component: divergence-diagnoser
+    expect: absent
+    rationale: >-
+      Enumera comandos permitidos (allowlist, no pasos) y es una investigación abierta con hipótesis; razonamiento
+      multi-paso justificado.
+  - id: E6
+    rule: ANY
+    component: leakage-reviewer
+    expect: absent
+    rationale: Revisión de código con juicio sobre riesgos de evaluación; perspectiva distinta de otros agentes; opus justificado.
+  - id: E7
+    rule: ANY
+    component: sweep-report
+    expect: absent
+    rationale: Comando con argumento (id de sweep) cuyo trabajo es interpretar resultados y recomendar; no es secuencia fija.
+  - id: E8
+    rule: ANY
+    component: model-card-writer
+    expect: absent
+    rationale: Skill de redacción con pasos numerados pero que exige juicio sobre limitaciones y vincular afirmaciones a datos.
+  - id: E9
+    rule: ANY
+    component: lr-schedule-advisor
+    expect: absent
+    rationale: Recomendación razonada que depende de la interacción de varios factores; razonamiento legítimo, sin herramientas que actúen.
+  - id: E10
+    rule: LLM-006
+    component: paper-summarizer
+    expect: optional
+    rationale: >-
+      Casi duplicado de paper-digest (mismo rol, herramientas y modelo, redacción distinta). El hallazgo podría
+      atribuirse a cualquiera de los dos, por eso ambos se dejan opcionales.
+  - id: E11
+    rule: LLM-006
+    component: paper-digest
+    expect: optional
+    rationale: Ver E10; pareja de casi duplicados, atribución ambigua.

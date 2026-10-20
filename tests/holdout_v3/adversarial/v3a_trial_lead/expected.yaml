@@ -1,0 +1,19 @@
+fixture: v3a_trial_lead
+description: Orquestador de investigación bioinformática con subagentes de búsqueda y de estadística.
+labeled_by: holdout-v3 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-012
+    component: LiteratureScout
+    expect: absent
+    rationale: Aísla una exploración grande de búsquedas con herramienta propia y se ejecuta en paralelo con otro delegado (exclusión de LLM-012).
+  - id: E2
+    rule: LLM-012
+    component: StatsRunner
+    expect: absent
+    rationale: Herramienta distinta (intérprete de código) y ejecución paralela; separación real de capacidades.
+  - id: E3
+    rule: LLM-012
+    component: TrialLead
+    expect: absent
+    rationale: El orquestador no solo reenvía, concilia resultados y redacta el informe con razonamiento propio.

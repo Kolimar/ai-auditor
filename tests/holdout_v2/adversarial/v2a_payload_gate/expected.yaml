@@ -1,0 +1,16 @@
+fixture: v2a_payload_gate
+description: Puerta de entrada de pedidos que pregunta a un LLM si el payload cumple el schema.
+labeled_by: holdout-v2 adversarial author
+expectations:
+  - id: E1
+    rule: [LLM-011, LLM-001]
+    component: check_order_payload
+    expect: present
+    rationale: >-
+      Se pide al LLM comprobar campos requeridos, tipos y rangos de un payload JSON frente a un schema; es trabajo de
+      validación de schema que haría jsonschema o pydantic.
+  - id: E2
+    rule: ANY
+    component: draft_apology
+    expect: absent
+    rationale: Redacción de una disculpa personalizada; LLM justificado.

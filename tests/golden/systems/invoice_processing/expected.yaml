@@ -1,0 +1,57 @@
+fixture: invoice_processing
+description: Procesado de facturas con OpenAI SDK; 6 pasos LLM, mezcla de parsing determinista delegado y extracción legítima desde OCR.
+labeled_by: golden-author-1
+expectations:
+  - id: E1
+    rule: LLM-009
+    component: parse_erp_csv
+    expect: present
+    rationale: >-
+      Entrada CSV de exportación ERP con cabecera fija conocida; es estructura legible por máquina (csv.DictReader).
+      LLM-009.
+  - id: E2
+    rule: LLM-010
+    component: convert_invoice_to_csv
+    expect: present
+    rationale: Transformación JSON a CSV sin cambio semántico, una fila por línea; LLM-010 (formateo).
+  - id: E3
+    rule: LLM-003
+    component: compute_invoice_totals
+    expect: present
+    rationale: >-
+      Suma, impuesto y total son aritmética determinista con salida corta y cerrada en un modelo de tier frontier;
+      LLM-003 (y mejor aún código, pero la regla más cercana es tamaño de modelo).
+  - id: E4
+    rule: [LLM-008, LLM-022]
+    component: categorize_line
+    expect: present
+    rationale: >-
+      Reintenta hasta 5 veces cuando json.loads falla (JSONDecodeError) sobre salida de texto libre, sin structured
+      outputs. LLM-008 / LLM-022.
+  - id: E5
+    rule: LLM-018
+    component: categorize_line
+    expect: optional
+    rationale: La categoría semántica de una descripción libre es clasificación estrecha; candidato a modelo pequeño, caso límite.
+  - id: E6
+    rule: LLM-009
+    component: extract_scanned_invoice
+    expect: absent
+    rationale: >-
+      OCR de escaneados con maquetación irregular y redacción variable por proveedor; extracción desde prosa libre,
+      exclusión explícita de LLM-009.
+  - id: E7
+    rule: LLM-018
+    component: extract_scanned_invoice
+    expect: optional
+    rationale: Extracción estrecha sobre texto libre; el texto de la regla la admite como candidata sujeta a experimento.
+  - id: E8
+    rule: ANY
+    component: explain_vendor_notes
+    expect: absent
+    rationale: Interpretación de notas en lenguaje natural del proveedor y redacción de recomendación para el analista; razonamiento sobre texto libre.
+  - id: E9
+    rule: ANY
+    component: draft_vendor_email
+    expect: absent
+    rationale: Redacción de un correo profesional con tono y restricciones legales; generación abierta, LLM justificado.

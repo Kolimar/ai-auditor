@@ -1,0 +1,16 @@
+fixture: v2a_chat_guard
+description: Asistente bancario con filtro de seguridad previo sobre mensajes libres del usuario.
+labeled_by: holdout-v2 adversarial author
+expectations:
+  - id: E1
+    rule: ANY
+    component: screen_message
+    expect: absent
+    rationale: >-
+      Moderación/guardrail de seguridad sobre texto libre con un modelo ya pequeño; validación de seguridad excluida de
+      LLM-002 y no hay decisión determinista (LLM-001). LLM-018 no aplica porque el modelo es pequeño.
+  - id: E2
+    rule: ANY
+    component: respond
+    expect: absent
+    rationale: Conversación abierta de dominio financiero; LLM justificado.

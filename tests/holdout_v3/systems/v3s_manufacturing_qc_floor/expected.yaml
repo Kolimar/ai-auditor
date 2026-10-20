@@ -1,0 +1,67 @@
+fixture: v3s_manufacturing_qc_floor
+description: Control de calidad de planta con 8 pasos LLM (Anthropic SDK y LangChain, retrieval con Chroma).
+labeled_by: holdout-v3 author A (Sonnet)
+expectations:
+  - id: E1
+    rule: [LLM-018, LLM-003]
+    component: classify_operator_remark
+    expect: present
+    rationale: >-
+      Comprensión de observaciones libres de operarios, pero tarea estrecha con salida cerrada (seis clases) y un
+      modelo frontier (opus) con max_tokens=16: LLM-018 (candidato a modelo pequeño) y LLM-003.
+  - id: E2
+    rule: LLM-001
+    component: decide_disposition
+    expect: present
+    rationale: >-
+      Mediciones numéricas estructuradas y tres reglas con umbrales explícitos (0.010 mm, dentro/fuera de límites)
+      producen ACCEPT/REWORK/SCRAP; función de decisión computable por código (LLM-001).
+  - id: E3
+    rule: LLM-009
+    component: parse_sensor_lines
+    expect: present
+    rationale: >-
+      Líneas de log de formato fijo (timestamp, línea, TEMP, PRESS, CYCLE) que una regex o split resuelve; LLM-009
+      ("líneas de log de formato fijo").
+  - id: E4
+    rule: LLM-024
+    component: parse_sensor_lines
+    expect: present
+    rationale: >-
+      Loop sobre un archivo de log nocturno con llamadas síncronas una por línea; procesamiento masivo no
+      interactivo donde la latencia no importa (LLM-024).
+  - id: E5
+    rule: [LLM-005, LLM-014]
+    component: check_station_compliance
+    expect: present
+    rationale: >-
+      El manual SOP completo (documento grande y estable) se reenvía en cada vuelta del loop de estaciones como
+      prefijo del system prompt sin cache_control: contexto repetido (LLM-005) y oportunidad de prompt caching (LLM-014).
+  - id: E6
+    rule: ANY
+    component: write_ncr_report
+    expect: absent
+    rationale: >-
+      Redacción narrativa de un informe de no conformidad a partir de observaciones libres; el campo de disposición
+      ya viene calculado. Generación de prosa, no rellenado mecánico de plantilla (exclusión de LLM-010).
+  - id: E7
+    rule: ANY
+    component: root_cause_analysis
+    expect: absent
+    rationale: >-
+      Razonamiento multi-paso complejo con extended thinking y presupuesto justificado; el razonamiento se muestra
+      al ingeniero para la reunión 8D, es decir se audita (exclusión de LLM-007 y de LLM-003).
+  - id: E8
+    rule: ANY
+    component: explain_spc_summary
+    expect: absent
+    rationale: >-
+      Cp y Cpk están calculados por el módulo SPC y el LLM solo los explica a un lector no técnico; exclusión
+      explícita de LLM-026 ("explicar un cálculo hecho en código").
+  - id: E9
+    rule: ANY
+    component: answer_sop_question
+    expect: absent
+    rationale: >-
+      RAG con n_results=3, contexto mínimo y respuesta con citas; la recuperación es pequeña (no LLM-016) y se
+      ejecuta una vez por pregunta (no LLM-015). Pregunta libre del técnico.

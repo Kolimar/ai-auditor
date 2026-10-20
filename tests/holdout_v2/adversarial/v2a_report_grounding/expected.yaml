@@ -1,0 +1,16 @@
+fixture: v2a_report_grounding
+description: Resumen de incidentes con verificación de grounding contra la fuente.
+labeled_by: holdout-v2 adversarial author
+expectations:
+  - id: E1
+    rule: [LLM-002, LLM-011, LLM-006]
+    component: check_claims_supported
+    expect: absent
+    rationale: >-
+      Es fact-checking/grounding contra una fuente, validación semántica que ningún schema ni decodificación restringida
+      cubre. Excluido de LLM-002 y LLM-011. Aporta una perspectiva distinta del generador (LLM-006 no aplica).
+  - id: E2
+    rule: ANY
+    component: summarize_incident
+    expect: absent
+    rationale: Resumen de texto libre; resumir está excluido de LLM-010 y es un uso legítimo del LLM.

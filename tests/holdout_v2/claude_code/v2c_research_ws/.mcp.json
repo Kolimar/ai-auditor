@@ -1,0 +1,5 @@
+{
+  "mcpServers": {
+    "pubmed": {"command": "uvx", "args": ["pubmed-mcp-server"]}
+  }
+}

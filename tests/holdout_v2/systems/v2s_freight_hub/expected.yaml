@@ -1,0 +1,57 @@
+fixture: v2s_freight_hub
+description: Hub de logística de carga con asignación de transportista, manifiestos EDI, enriquecimiento de envíos, aduanas y asistente de despacho.
+labeled_by: holdout-v2 author (sistemas Python)
+expectations:
+  - id: E1
+    rule: LLM-001
+    component: pick_carrier
+    expect: present
+    rationale: >-
+      Reglas ordenadas sobre un booleano y dos umbrales numéricos con salida de etiqueta cerrada; función de decisión
+      completamente especificada y computable (LLM-001).
+  - id: E2
+    rule: LLM-009
+    component: parse_edi_manifest
+    expect: present
+    rationale: >-
+      Manifiesto XML de esquema fijo; LLM-009 incluye XML con estructura estable. Se extrae con un parser, no con LLM.
+  - id: E3
+    rule: LLM-025
+    component: enrich_shipment
+    expect: present
+    rationale: >-
+      Tres llamadas secuenciales (resumen de nota, traducción, mensaje ETA) cuyas entradas salen todas del mismo dict de
+      entrada y ninguna depende de la salida de otra; paralelizables (LLM-025).
+  - id: E4
+    rule: LLM-023
+    component: answer_status_question
+    expect: present
+    rationale: >-
+      Envía 12 definiciones de herramientas (incluidas cancelar, reembolsar, bloquear transportista) en un paso cuyo
+      prompt solo usa dos de ellas; schemas en cada llamada sin necesidad (LLM-023).
+  - id: E5
+    rule: ANY
+    component: customs_description_review
+    expect: absent
+    rationale: >-
+      Revisión semántica de coherencia entre descripción libre y código HS en dominio regulatorio; exclusión de LLM-003
+      (alto riesgo) y de LLM-002 (cumplimiento).
+  - id: E6
+    rule: ANY
+    component: draft_delay_apology
+    expect: absent
+    rationale: Redacción empática y personalizada de prosa; generación abierta justificada.
+  - id: E7
+    rule: ANY
+    component: plan_consolidation
+    expect: absent
+    rationale: >-
+      Optimización con restricciones y razonamiento multi-paso que además se justifica; modelo grande legítimo (exclusión
+      de LLM-003) y un único modelo en el paso complejo.
+  - id: E8
+    rule: [LLM-014, LLM-005]
+    component: answer_tariff_question
+    expect: optional
+    rationale: >-
+      El prefijo (manual de tarifas leído de archivo) es idéntico en cada llamada y no hay cache_control, pero su tamaño
+      no es visible estáticamente: si supera el mínimo cacheable aplica LLM-014, si no queda excluido.

@@ -1,0 +1,61 @@
+fixture: v3s_insurance_claims_desk
+description: Mesa de siniestros de seguros personales con 8 pasos LLM (Anthropic SDK y LiteLLM).
+labeled_by: holdout-v3 author A (Sonnet)
+expectations:
+  - id: E1
+    rule: LLM-009
+    component: extract_claim_fields
+    expect: present
+    rationale: >-
+      El payload es JSON del portal con claves fijas; copiar policy_number, loss_date y claimed_amount es lectura
+      de campos de una entrada con estructura legible por máquina (definición de LLM-009).
+  - id: E2
+    rule: [LLM-003, LLM-018]
+    component: tag_claim_category
+    expect: present
+    rationale: >-
+      Clasificación de una descripción en texto libre a una de seis etiquetas cerradas, salida de pocos tokens y
+      un modelo de tier frontier (opus). Encaja con LLM-003 (modelo grande para tarea simple) y LLM-018 (candidato
+      a modelo pequeño); no hay razonamiento multi-paso.
+  - id: E3
+    rule: LLM-001
+    component: check_coverage
+    expect: present
+    rationale: >-
+      Entradas estructuradas (estado, fecha, peril en lista, importe vs franquicia) y cinco reglas ordenadas con
+      umbrales explícitos que producen APPROVE/DENY/REFER, un conjunto cerrado. Es computable por código; no hay
+      interpretación de lenguaje natural libre (definición de LLM-001).
+  - id: E4
+    rule: LLM-026
+    component: compute_settlement
+    expect: present
+    rationale: >-
+      Se pide al LLM calcular (reclamado - franquicia) * porcentaje más impuesto sobre valores ya conocidos;
+      aritmética exacta con dinero que el código haría sin error (LLM-026).
+  - id: E5
+    rule: ANY
+    component: summarize_adjuster_notes
+    expect: absent
+    rationale: >-
+      Resumen de notas de campo en prosa libre; la exclusión de LLM-010 deja fuera el resumen y LLM-009 solo cubre
+      entradas con estructura de máquina. Uso legítimo del LLM.
+  - id: E6
+    rule: ANY
+    component: assess_statement_consistency
+    expect: absent
+    rationale: >-
+      Compara dos relatos en lenguaje natural y busca contradicciones de cronología. Es validación/razonamiento
+      semántico (exclusión de LLM-002 y LLM-001: interpretación de texto libre) en un dominio de riesgo de fraude.
+  - id: E7
+    rule: ANY
+    component: draft_denial_letter
+    expect: absent
+    rationale: >-
+      Generación abierta y empática dirigida a una persona; no es reescritura mecánica ni formateo (exclusión de LLM-010).
+  - id: E8
+    rule: ANY
+    component: translate_notice
+    expect: absent
+    rationale: >-
+      Traducción, explícitamente fuera de LLM-010 ("No es: reescritura de prosa, traducción, resumen"). Modelo
+      pequeño ya, así que tampoco aplica LLM-003.

@@ -1,0 +1,15 @@
+fixture: v3a_h_claims_desk
+description: Mesa de siniestros de seguros que enruta reclamaciones y consulta pólizas.
+labeled_by: holdout-v3 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-001
+    component: route
+    expect: present
+    rationale: >-
+      La tabla de enrutamiento está totalmente especificada con umbrales de importe y banderas booleanas sobre un registro estructurado; es computable con if/else. El prompt se ensambla en otro módulo y el modelo viene de configuración.
+  - id: E2
+    rule: LLM-017
+    component: answer_with_policy
+    expect: present
+    rationale: tool_choice forzado a una herramienta concreta; la llamada es invariante y puede hacerse en código antes del LLM.

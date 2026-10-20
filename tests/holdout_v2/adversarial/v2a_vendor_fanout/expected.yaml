@@ -1,0 +1,14 @@
+fixture: v2a_vendor_fanout
+description: Revisión de proveedores con tres evaluaciones independientes lanzadas en paralelo.
+labeled_by: holdout-v2 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-025
+    component: vendor_review
+    expect: absent
+    rationale: Las tres llamadas independientes ya se ejecutan con asyncio.gather; no son secuenciales.
+  - id: E2
+    rule: ANY
+    component: assess_contract
+    expect: absent
+    rationale: Análisis de riesgo legal sobre prosa en dominio de alto riesgo; razonamiento abierto justificado.

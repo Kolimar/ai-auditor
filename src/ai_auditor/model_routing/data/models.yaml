@@ -1,0 +1,49 @@
+# Model metadata that is NOT price: tier patterns, aliases and prompt-caching rules.
+# Sources: official provider docs, retrieved 2026-10-19.
+# Tiers are relative capability/cost classes inside a provider family, used only to say
+# "a smaller model of the same family exists". They never imply equal quality.
+retrieved_at: "2026-10-19"
+
+aliases:  # Claude Code / shorthand -> catalog id (as of retrieved_at)
+  opus: claude-opus-5-5
+  sonnet: claude-sonnet-5-5
+  haiku: claude-haiku-5-5
+  fable: claude-fable-5-1
+
+tier_patterns:  # first match wins; regex over the normalized id
+  - {provider: anthropic, pattern: "fable|mythos", tier: frontier}
+  - {provider: anthropic, pattern: "opus", tier: frontier}
+  - {provider: anthropic, pattern: "sonnet", tier: large}
+  - {provider: anthropic, pattern: "haiku", tier: small}
+  - {provider: openai, pattern: "-pro(\\b|$)", tier: frontier}
+  - {provider: openai, pattern: "nano", tier: small}
+  - {provider: openai, pattern: "mini", tier: small}
+  - {provider: openai, pattern: "^o\\d", tier: large}
+  - {provider: openai, pattern: "^gpt-(4o|4\\.1|5(\\.\\d)?)$", tier: large}
+  - {provider: google, pattern: "flash-lite", tier: small}
+  - {provider: google, pattern: "flash", tier: medium}
+  - {provider: google, pattern: "pro", tier: large}
+  - {provider: deepseek, pattern: "flash", tier: small}
+
+price_tiers:  # fallback when no pattern matches: input USD / 1M tokens
+  frontier: 8.0
+  large: 1.5
+  medium: 0.4
+
+caching:
+  anthropic:
+    mechanism: explicit  # cache_control (block-level or top-level); opt-in
+    min_tokens:
+      - {pattern: "fable-5-1|mythos-5-1|opus-5-5|opus-5$|sonnet-5-5|fable-5$|mythos-5$|haiku-5-5", min: 512}
+      - {pattern: "opus-4-8|sonnet-5$|sonnet-4-6|sonnet-4-5|opus-4-1|opus-4$|sonnet-4$", min: 1024}
+      - {pattern: "mythos-preview|opus-4-7|haiku-3-5", min: 2048}
+      - {pattern: "opus-4-6|opus-4-5|haiku-4-5", min: 4096}
+  openai:
+    mechanism: automatic  # exact-prefix, no opt-in
+    min_tokens:
+      - {pattern: ".*", min: 1024}
+  google:
+    mechanism: automatic  # implicit caching (explicit caches also available)
+    min_tokens:
+      - {pattern: "gemini-4|3\\.8-flash|3\\.6-flash|3\\.1-pro", min: 4096}
+      - {pattern: "2\\.5-(flash|pro)", min: 2048}

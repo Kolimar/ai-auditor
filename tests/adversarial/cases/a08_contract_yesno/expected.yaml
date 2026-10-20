@@ -1,0 +1,11 @@
+fixture: a08_contract_yesno
+description: Salida si/no pero razonamiento multi-paso sobre documentos largos con modelo grande.
+labeled_by: red-team
+expectations:
+  - id: E1
+    rule: ANY
+    component: is_contract_compliant
+    expect: absent
+    rationale: >-
+      LLM-003 "No es: razonamiento multi-paso ... dominios de alto riesgo". LLM-004 "No es: contexto que es el objeto
+      de la tarea" (contrato y normativa). LLM-007 "No es": razonamiento que mejora tarea compleja.

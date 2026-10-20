@@ -1,0 +1,89 @@
+fixture: v2c_monorepo
+description: Monorepo grande con muchos agentes opus, CLAUDE.md extenso y ocho servidores MCP.
+labeled_by: holdout-v2 author (claude_code)
+expectations:
+  - id: E1
+    rule: ANY
+    component: arch-planner
+    expect: absent
+    rationale: Planificación cross-package con razonamiento sobre dependencias y riesgo; opus justificado.
+  - id: E2
+    rule: ANY
+    component: ts-reviewer
+    expect: absent
+    rationale: Revisión de código TypeScript con criterios específicos de lenguaje; no es redundante con go-reviewer (otro lenguaje, otros criterios, LLM-006 No es).
+  - id: E3
+    rule: ANY
+    component: go-reviewer
+    expect: absent
+    rationale: Revisión de Go con criterios distintos (concurrencia); parecido estructural a ts-reviewer pero aporta perspectiva distinta.
+  - id: E4
+    rule: LLM-006
+    component: api-reviewer
+    expect: optional
+    rationale: Casi duplicado de backend-reviewer (mismo rol, herramientas y modelo); no se sabe cuál se marca, ambos optional.
+  - id: E5
+    rule: LLM-006
+    component: backend-reviewer
+    expect: optional
+    rationale: Ver E4.
+  - id: E6
+    rule: [LLM-006, LLM-012]
+    component: task-dispatcher
+    expect: present
+    rationale: Orquestador cuyo único trabajo es reenviar la petición a feature-builder y devolver su respuesta; pass-through sin herramientas ni modelo distintos.
+  - id: E7
+    rule: ANY
+    component: feature-builder
+    expect: absent
+    rationale: Implementación de funcionalidades con herramientas que actúan y razonamiento multi-paso; código complejo.
+  - id: E8
+    rule: LLM-003
+    component: import-sorter
+    expect: present
+    rationale: Ordenar imports es mecánico y acotado (un linter lo hace); usa opus. LLM-010 también describe formateo, pero el rule aceptable principal es la elección de modelo.
+  - id: E9
+    rule: ANY
+    component: migration-debugger
+    expect: absent
+    rationale: Diagnóstico de migraciones con consultas e inferencia de bloqueos; razonamiento multi-paso en dominio de riesgo.
+  - id: E10
+    rule: ANY
+    component: test-writer
+    expect: absent
+    rationale: Generación de código de pruebas con ejecución iterativa; sonnet es proporcionado.
+  - id: E11
+    rule: ANY
+    component: changelog-entry
+    expect: absent
+    rationale: Redacción en lenguaje de usuario a partir de commits con haiku; ya usa un modelo pequeño (no aplica LLM-003 ni LLM-018) y es generación.
+  - id: E12
+    rule: LLM-017
+    component: new-package
+    expect: present
+    rationale: Siete comandos fijos de scaffolding parametrizados solo por el nombre; un script los ejecuta.
+  - id: E13
+    rule: ANY
+    component: migration-debugging
+    expect: absent
+    rationale: Skill procedural de pasos que requieren decidir con justificación; no hay comandos fijos.
+  - id: E14
+    rule: ANY
+    component: plan
+    expect: absent
+    rationale: El comando delega la planificación abierta con argumento libre; el subagente aporta modelo y contexto propio (planner).
+  - id: E15
+    rule: LLM-017
+    component: sync-deps
+    expect: present
+    rationale: Cuatro comandos fijos siempre en el mismo orden sin dependencia de la entrada.
+  - id: E16
+    rule: LLM-004
+    component: CLAUDE.md
+    expect: present
+    rationale: CLAUDE.md siempre cargado y muy extenso, con secciones por paquete repetitivas que no son necesarias en la mayoría de tareas; instrucciones siempre cargadas desproporcionadas (LLM-004).
+  - id: E17
+    rule: LLM-013
+    component: "*system*"
+    expect: optional
+    rationale: Casi todos los agentes usan opus con perfiles heterogéneos (import-sorter simple, feature-builder complejo), pero algunos ya usan sonnet y haiku; caso límite para routing.

@@ -1,0 +1,11 @@
+fixture: a11_summarize_filing
+description: Resumen de documento completo; el documento es el objeto de la tarea.
+labeled_by: red-team
+expectations:
+  - id: E1
+    rule: [LLM-004, LLM-016, LLM-003]
+    component: summarize_filing
+    expect: absent
+    rationale: >-
+      LLM-004 "No es: contexto que es el objeto de la tarea (resume este documento)". Resumen largo con comparacion
+      implicita; no es tarea simple (LLM-003).

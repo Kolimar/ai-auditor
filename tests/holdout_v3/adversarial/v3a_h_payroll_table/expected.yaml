@@ -1,0 +1,14 @@
+fixture: v3a_h_payroll_table
+description: Generación de recibos de nómina en tabla a partir de registros de empleados.
+labeled_by: holdout-v3 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-010
+    component: render_pay_slip
+    expect: present
+    rationale: Transforma un dict ya disponible en tabla con barras, reformatea fechas e importes sin cambio semántico; es formateo puro, aunque el verbo sea descriptivo.
+  - id: E2
+    rule: ANY
+    component: flag_unusual_notes
+    expect: absent
+    rationale: Interpreta notas libres para detectar quejas; comprensión de lenguaje con justificación.

@@ -1,0 +1,11 @@
+fixture: a12_reglas_como_ejemplo
+description: Prompt en espanol con regla de umbral usada solo como ejemplo en tarea generativa.
+labeled_by: red-team
+expectations:
+  - id: E1
+    rule: [LLM-001, LLM-010, LLM-020, LLM-014]
+    component: redactar_guia_gastos
+    expect: absent
+    rationale: >-
+      LLM-001 exige que la salida elija entre alternativas cerradas segun reglas completas; aqui es generacion
+      abierta y la regla es ilustrativa. Entradas libres (tono) y temperatura alta: ni LLM-020 ni LLM-014.

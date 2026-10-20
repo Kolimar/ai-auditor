@@ -1,0 +1,14 @@
+fixture: v3a_h_envios_csv
+description: Carga de manifiestos de envíos en CSV con campos separados por punto y coma, y avisos a clientes.
+labeled_by: holdout-v3 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-009
+    component: extraer_envio
+    expect: present
+    rationale: Cada línea es una fila CSV con campos delimitados y formato regular (tracking, peso, ciudad, fecha); extraerlos es parseo determinista. Prompt en español.
+  - id: E2
+    rule: ANY
+    component: redactar_aviso_retraso
+    expect: absent
+    rationale: Generación empática abierta dirigida al cliente; el LLM está justificado.

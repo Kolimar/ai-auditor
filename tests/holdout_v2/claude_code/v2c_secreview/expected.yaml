@@ -1,0 +1,54 @@
+fixture: v2c_secreview
+description: Espacio de trabajo de revisión de seguridad con agentes de modelado de amenazas, triage y utilidades de escaneo.
+labeled_by: holdout-v2 author (claude_code)
+expectations:
+  - id: E1
+    rule: ANY
+    component: threat-modeler
+    expect: absent
+    rationale: Modelado de amenazas, razonamiento abierto en dominio de alto riesgo, lectura de código y diseño; LLM-000.
+  - id: E2
+    rule: ANY
+    component: vuln-triager
+    expect: absent
+    rationale: Seguimiento de flujo de datos y juicio de explotabilidad; validación semántica de seguridad, no cubierta por otro mecanismo.
+  - id: E3
+    rule: ANY
+    component: dependency-auditor
+    expect: absent
+    rationale: Lista de comandos permitidos (allowlist) pero el trabajo es investigar relevancia de advisories; LLM-017 excluye allowlists y la tarea depende del contenido.
+  - id: E4
+    rule: LLM-017
+    component: secret-sweep
+    expect: present
+    rationale: Tres comandos en orden fijo, siempre, sin dependencia de la entrada; ejecutables por un script. No es allowlist sino pasos secuenciales ("in order", "do not skip"). Además opus para ello.
+  - id: E5
+    rule: LLM-026
+    component: cvss-calculator
+    expect: present
+    rationale: Cálculo exacto con fórmulas oficiales sobre un vector ya conocido; definición de LLM-026 (cómputo determinista).
+  - id: E6
+    rule: [LLM-009, LLM-010]
+    component: sarif-summary
+    expect: present
+    rationale: SARIF es JSON con estructura estable; extraer campos por ruta fija y ordenar por nivel es un parser; cae en LLM-009.
+  - id: E7
+    rule: ANY
+    component: owasp-code-review
+    expect: absent
+    rationale: Skill procedural larga que necesita juicio (lógica de negocio, explotabilidad); no es secuencia fija de comandos.
+  - id: E8
+    rule: ANY
+    component: incident-writeup
+    expect: absent
+    rationale: Redacción de informe a partir de notas con conflictos de hechos; generación abierta y resumen.
+  - id: E9
+    rule: ANY
+    component: scan-diff
+    expect: absent
+    rationale: Un único comando de lectura de diff con argumento; la tarea es revisar el diff (objeto de la tarea) con juicio de seguridad.
+  - id: E10
+    rule: ANY
+    component: pentest-report-intro
+    expect: absent
+    rationale: Resumen ejecutivo en prosa para audiencia no técnica; generación abierta.

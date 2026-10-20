@@ -1,0 +1,57 @@
+fixture: batch_enrichment
+description: Job nocturno LiteLLM que recorre ~50k reseñas en un CSV con llamadas síncronas por fila.
+labeled_by: golden-author-1
+expectations:
+  - id: E1
+    rule: [LLM-018, LLM-003]
+    component: classify_review_sentiment
+    expect: present
+    rationale: >-
+      Sentimiento de reseñas libres (sarcasmo, jerga) exige comprensión de lenguaje, así que NO es LLM-009 ni reglas;
+      pero es clasificación cerrada de 4 etiquetas con gpt-5.5, candidata a modelo pequeño (LLM-018) en cascada.
+  - id: E2
+    rule: LLM-014
+    component: classify_review_sentiment
+    expect: present
+    rationale: >-
+      SYSTEM prompt estático de varios miles de tokens (guías, ejemplos y 60 notas) reenviado idéntico en cada una de
+      las ~50k llamadas sin cache_control ni caching de prefijo.
+  - id: E3
+    rule: LLM-024
+    component: classify_review_sentiment
+    expect: present
+    rationale: Bucle batch nocturno sobre un CSV con litellm.completion síncrono por fila; la latencia no importa, aplica Batch API.
+  - id: E4
+    rule: LLM-009
+    component: classify_review_sentiment
+    expect: absent
+    rationale: Las reseñas son prosa libre con sarcasmo; no hay estructura legible por máquina que parsear.
+  - id: E5
+    rule: LLM-001
+    component: classify_review_sentiment
+    expect: absent
+    rationale: No hay reglas explícitas sobre campos estructurados; el criterio es interpretar el lenguaje.
+  - id: E6
+    rule: LLM-020
+    component: describe_department
+    expect: present
+    rationale: >-
+      La entrada es department_code, un dominio finito y pequeño conocido de antemano (catálogo de departamentos);
+      se puede calcular una vez por código y consultar en vez de llamar por cada fila.
+  - id: E7
+    rule: [LLM-003, LLM-018, LLM-001, LLM-009]
+    component: flag_policy_violation
+    expect: absent
+    rationale: >-
+      Moderación de contenido (discurso de odio, amenazas, promoción no declarada) es juicio semántico sobre texto libre
+      y de riesgo; no se debe recomendar quitar o reducir el modelo sin experimento.
+  - id: E8
+    rule: [LLM-003, LLM-018, LLM-001, LLM-009, LLM-010]
+    component: draft_review_reply
+    expect: absent
+    rationale: Redacción empática y específica de respuestas públicas con opus; generación abierta.
+  - id: E9
+    rule: ANY
+    component: write_weekly_digest
+    expect: absent
+    rationale: Una sola llamada por ejecución que razona sobre cifras y propone hipótesis y acciones; fuera del bucle y generación abierta.

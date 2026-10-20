@@ -1,0 +1,19 @@
+fixture: v3a_lease_review
+description: Revisión de un contrato de arrendamiento completo para un inquilino, con razonamiento cruzado entre cláusulas.
+labeled_by: holdout-v3 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-004
+    component: review_lease
+    expect: absent
+    rationale: El contrato completo es el objeto de la tarea ("revisa este documento"); exclusión de LLM-004.
+  - id: E2
+    rule: LLM-003
+    component: review_lease
+    expect: absent
+    rationale: Razonamiento multi-paso sobre cláusulas cruzadas en dominio de riesgo; exclusión de LLM-003.
+  - id: E3
+    rule: LLM-007
+    component: review_lease
+    expect: absent
+    rationale: El razonamiento paso a paso mejora una tarea compleja y se entrega al usuario (exclusión de LLM-007).

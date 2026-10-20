@@ -1,0 +1,46 @@
+fixture: spanish_assistant
+description: Asistente de soporte con Google GenAI (gemini-2.5-pro) y prompts en español; mismos smells que otros sistemas, redactados en español.
+labeled_by: golden-author-1
+expectations:
+  - id: E1
+    rule: LLM-001
+    component: clasificar_prioridad
+    expect: present
+    rationale: >-
+      Salida cerrada ALTA/MEDIA/BAJA con cinco reglas explícitas sobre campos (plan, horas_sla_restantes, caida_servicio,
+      tickets_abiertos, importe_reclamado). Decisión determinista aunque el prompt esté en español.
+  - id: E2
+    rule: LLM-009
+    component: extraer_campos_pago
+    expect: present
+    rationale: La entrada es un JSON de la pasarela de pagos con claves estables; extraer campos es indexar el diccionario.
+  - id: E3
+    rule: LLM-010
+    component: formatear_fecha
+    expect: present
+    rationale: Conversión de fecha AAAA-MM-DD a "D de mes de AAAA"; formato de fechas sin cambio semántico.
+  - id: E4
+    rule: [LLM-003, LLM-018]
+    component: formatear_fecha
+    expect: optional
+    rationale: Tarea trivial con gemini-2.5-pro; se acepta como hallazgo secundario junto a LLM-010.
+  - id: E5
+    rule: LLM-001
+    component: interpretar_mensaje
+    expect: absent
+    rationale: Distingue queja seria de ironía leve interpretando sarcasmo en lenguaje natural libre; clasificación semántica, no reglas.
+  - id: E6
+    rule: LLM-009
+    component: interpretar_mensaje
+    expect: absent
+    rationale: El mensaje es prosa libre; no hay estructura legible por máquina.
+  - id: E7
+    rule: ANY
+    component: redactar_respuesta
+    expect: absent
+    rationale: Redacción empática de respuesta al cliente en español; generación abierta, LLM justificado.
+  - id: E8
+    rule: ANY
+    component: resumir_hilo
+    expect: absent
+    rationale: Resumen de un hilo de correos con detección de contradicciones y responsables; el hilo es el objeto de la tarea (excluido de LLM-004).

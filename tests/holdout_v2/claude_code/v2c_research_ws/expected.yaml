@@ -1,0 +1,60 @@
+fixture: v2c_research_ws
+description: Espacio de trabajo de investigación (microbioma de suelo) con agentes de literatura, estadística y tareas de formato.
+labeled_by: holdout-v2 author (claude_code)
+expectations:
+  - id: E1
+    rule: ANY
+    component: literature-scout
+    expect: absent
+    rationale: Búsqueda y cribado con juicio de relevancia sobre texto libre, herramientas web; exploración abierta. Resumen/selección no es formateo.
+  - id: E2
+    rule: ANY
+    component: paper-summarizer
+    expect: absent
+    rationale: Resumen estructurado de un artículo en prosa con limitaciones propias del lector; resumen excluido de LLM-010; sin agente previo que rehacer.
+  - id: E3
+    rule: LLM-006
+    component: summary-of-summaries
+    expect: present
+    rationale: Resume las notas ya resumidas por paper-summarizer ("resume el resumen"); definición literal de LLM-006.
+  - id: E4
+    rule: ANY
+    component: stats-reviewer
+    expect: absent
+    rationale: Crítica estadística con razonamiento experto y criterios distintos de quien generó el análisis; opus justificado.
+  - id: E5
+    rule: [LLM-010, LLM-003]
+    component: table-formatter
+    expect: present
+    rationale: CSV a tabla Markdown sin cambio semántico (LLM-010), con opus en una tarea trivial (LLM-003).
+  - id: E6
+    rule: LLM-010
+    component: citation-converter
+    expect: present
+    rationale: BibTeX a cadenas APA es una conversión de formato con reglas fijas y entrada con estructura de máquina; no hay cambio semántico.
+    min_level: LIKELY
+  - id: E7
+    rule: LLM-017
+    component: experiment-log
+    expect: present
+    rationale: Cinco comandos fijos tras cada ejecución; un hook o script lo hace sin modelo.
+  - id: E8
+    rule: ANY
+    component: hypothesis-critique
+    expect: absent
+    rationale: Crítica de hipótesis con razonamiento abierto y propuesta de experimentos; no hay comandos ni formato.
+  - id: E9
+    rule: ANY
+    component: compare-papers
+    expect: absent
+    rationale: Comparación y valoración de dos artículos leídos desde prosa; razonamiento sobre texto libre.
+  - id: E10
+    rule: LLM-026
+    component: convert-units
+    expect: present
+    rationale: Conversión de unidades sobre valores ya conocidos, cálculo exacto que el código hace sin error; LLM-026 incluye conversiones de unidades.
+  - id: E11
+    rule: ANY
+    component: explain-result
+    expect: absent
+    rationale: Explicar un resultado producido en código y anticipar preguntas; LLM-026 excluye explicar un cálculo; generación y razonamiento.

@@ -1,0 +1,16 @@
+fixture: a10_critic_agents
+description: Generador y critico con criterios distintos.
+labeled_by: red-team
+expectations:
+  - id: E1
+    rule: [LLM-006, LLM-012, LLM-002]
+    component: compliance-critic
+    expect: absent
+    rationale: >-
+      LLM-006 "No es: verificacion distinta ... un critico con criterios diferentes del generador". LLM-002 "No es":
+      cumplimiento de politicas. Herramientas distintas (Read vs Read, Grep) pero criterio totalmente distinto.
+  - id: E2
+    rule: ANY
+    component: release-notes-drafter
+    expect: absent
+    rationale: Generacion abierta de prosa para usuarios.

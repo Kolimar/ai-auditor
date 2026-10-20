@@ -1,0 +1,41 @@
+fixture: content_studio
+description: Estudio editorial multi-SDK (Anthropic, OpenAI, Google) donde la mayoría de pasos LLM son legítimos; mide falsos positivos.
+labeled_by: golden-author-1
+expectations:
+  - id: E1
+    rule: ANY
+    component: write_draft
+    expect: absent
+    rationale: Generación creativa larga con voz propia; generación abierta, LLM necesario.
+  - id: E2
+    rule: ANY
+    component: critique_draft
+    expect: absent
+    rationale: >-
+      Crítico con criterios editoriales distintos de los del generador (originalidad, cautela factual, coherencia);
+      aporta perspectiva diferente, exclusión explícita de LLM-006 y LLM-002.
+  - id: E3
+    rule: ANY
+    component: translate_article
+    expect: absent
+    rationale: Traducción con matices (ironía, juegos de palabras); explícitamente fuera de LLM-010.
+  - id: E4
+    rule: ANY
+    component: summarize_report
+    expect: absent
+    rationale: Resumen de un informe largo; el documento es el objeto de la tarea, excluido de LLM-004.
+  - id: E5
+    rule: ANY
+    component: suggest_headlines
+    expect: absent
+    rationale: Generación creativa con ángulos distintos y temperatura alta; no es clasificación ni formateo.
+  - id: E6
+    rule: LLM-010
+    component: make_slug
+    expect: present
+    rationale: Conversión determinista de un titular a slug (minúsculas, ASCII, guiones); transformación de presentación.
+  - id: E7
+    rule: LLM-010
+    component: format_publication_date
+    expect: present
+    rationale: Formato de fecha ISO 8601 a 'Month D, YYYY'; el ejemplo literal de LLM-010.

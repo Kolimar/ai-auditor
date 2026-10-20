@@ -1,0 +1,49 @@
+fixture: v2s_catalog_sync
+description: Sincronización de catálogo de e-commerce con LiteLLM y Google GenAI.
+labeled_by: holdout-v2 author (sistemas Python)
+expectations:
+  - id: E1
+    rule: LLM-026
+    component: convert_listing_units
+    expect: present
+    rationale: >-
+      Conversión de onzas, pulgadas y divisas con factores dados en el propio prompt sobre valores ya conocidos;
+      LLM-026 (conversiones de unidades) lo hace el código sin error.
+  - id: E2
+    rule: LLM-010
+    component: render_spec_table
+    expect: present
+    rationale: >-
+      JSON a tabla Markdown sin cambio semántico, pidiendo explícitamente no añadir ni quitar filas; ejemplo literal de
+      LLM-010.
+  - id: E3
+    rule: [LLM-003, LLM-018]
+    component: assign_category
+    expect: present
+    rationale: >-
+      Clasificación de títulos en texto libre a una categoría de salida cerrada, entrada acotada y modelo grande
+      (gpt-4o); LLM-003 por tamaño, LLM-018 por candidato a modelo pequeño.
+  - id: E4
+    rule: LLM-020
+    component: category_banner_text
+    expect: present
+    rationale: >-
+      La única variable es un Enum de 12 valores conocidos de antemano; se puede generar offline una vez por categoría
+      (LLM-020, dominio finito pequeño).
+  - id: E5
+    rule: ANY
+    component: write_product_description
+    expect: absent
+    rationale: Generación abierta y persuasiva de texto de marketing; no hay determinismo ni salida cerrada.
+  - id: E6
+    rule: ANY
+    component: moderate_review
+    expect: absent
+    rationale: >-
+      Moderación de contenido (seguridad, abuso) sobre texto libre; validación semántica excluida de LLM-002/LLM-011, y
+      modelo ya ligero.
+  - id: E7
+    rule: ANY
+    component: alt_text_for_image
+    expect: absent
+    rationale: Descripción de imagen (multimodal) con modelo flash; el LLM es imprescindible y no hay opción determinista.

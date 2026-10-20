@@ -1,0 +1,11 @@
+fixture: b02_prompt_from_constants
+description: Reglas deterministas en constantes de otro modulo, prompt armado por concatenacion.
+labeled_by: red-team
+expectations:
+  - id: E1
+    rule: LLM-001
+    component: decide_refund
+    expect: present
+    rationale: >-
+      LLM-001 "Es": salida cerrada (3 alternativas) con umbrales numericos y booleanos sobre entradas estructuradas
+      completamente especificadas. Las reglas estan en prompts.py; hay que resolver constantes importadas.

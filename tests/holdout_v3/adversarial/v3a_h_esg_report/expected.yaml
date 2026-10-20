@@ -1,0 +1,9 @@
+fixture: v3a_h_esg_report
+description: Generador de informes de sostenibilidad por secciones con recuperación sobre un vector store.
+labeled_by: holdout-v3 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-015
+    component: draft_section
+    expect: present
+    rationale: La consulta depende solo de la empresa y el almacén, no de la sección; build_report llama seis veces con la misma consulta y fuente sin reutilizar el resultado.

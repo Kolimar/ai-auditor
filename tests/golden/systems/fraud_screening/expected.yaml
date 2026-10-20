@@ -1,0 +1,38 @@
+fixture: fraud_screening
+description: Cribado de fraude en tarjetas con pydantic-ai; dominio de alto riesgo con decisiones por umbral y análisis semántico legítimo.
+labeled_by: golden-author-1
+expectations:
+  - id: E1
+    rule: LLM-001
+    component: amount_decision_agent
+    expect: present
+    rationale: >-
+      Salida cerrada approve/review/block decidida por umbrales numéricos explícitos sobre un importe (250, 2500);
+      función totalmente computable por código. Que el dominio sea de riesgo no la hace semántica.
+  - id: E2
+    rule: LLM-001
+    component: velocity_check_agent
+    expect: present
+    rationale: Comparación de txns_last_hour con límites fijos por tier (5 / 12); igualdad de campo y umbral numérico.
+  - id: E3
+    rule: LLM-010
+    component: case_card_agent
+    expect: present
+    rationale: Rellena una plantilla literal con campos ya disponibles (txn_id, importe, acción); LLM-010 (plantilla).
+  - id: E4
+    rule: ANY
+    component: dispute_narrative_agent
+    expect: absent
+    rationale: >-
+      Análisis de narrativa libre de la disputa, detecta inconsistencias de relato; juicio sobre lenguaje natural
+      ambiguo en dominio de alto riesgo, no se toca sin experimento (exclusión de LLM-003).
+  - id: E5
+    rule: ANY
+    component: ring_reasoner_agent
+    expect: absent
+    rationale: Razonamiento multi-paso sobre vínculos entre cuentas y explicaciones inocentes; alto riesgo y modelo grande justificado.
+  - id: E6
+    rule: ANY
+    component: risk_explainer_agent
+    expect: absent
+    rationale: Explicación en lenguaje natural para el analista sobre por qué se ruteó el caso; redacción dirigida a una persona.

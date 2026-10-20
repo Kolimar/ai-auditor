@@ -1,0 +1,64 @@
+fixture: v3s_utility_billing_ops
+description: Operaciones de facturacion de una utility (lecturas de medidores, tarifas, comunicaciones al cliente) con OpenAI chat completions y Responses API.
+labeled_by: holdout_v3 author (sonnet), written against docs/RULES.md
+expectations:
+  - id: E1
+    rule: LLM-009
+    component: normalize_meter_reading
+    expect: present
+    rationale: >-
+      La entrada es una linea de gateway AMR con formato fijo clave=valor separada por ';'; es una estructura legible por maquina que se parsea con split (definicion de LLM-009, lineas de log de formato fijo).
+  - id: E2
+    rule: LLM-022
+    component: normalize_meter_reading
+    expect: present
+    rationale: >-
+      La salida en texto libre se pasa a json.loads sin structured outputs ni constrained decoding.
+  - id: E3
+    rule: LLM-008
+    component: normalize_meter_reading
+    expect: present
+    rationale: >-
+      El bucle reintenta hasta cinco veces ante JSONDecodeError y ValidationError, es decir fallos de formato/validacion, no errores de red; un structured output o parser determinista lo evitaria.
+  - id: E4
+    rule: [LLM-011, LLM-002]
+    component: verify_reading_payload
+    expect: present
+    rationale: >-
+      Se pide al LLM comprobar campos requeridos, tipo numerico, rango >= 0 y formato ISO del timestamp: trabajo de schema (LLM-011), ademas ya garantizado por el modelo pydantic Reading (LLM-002).
+  - id: E5
+    rule: LLM-026
+    component: compute_tiered_charge
+    expect: present
+    rationale: >-
+      Calculo exacto de un cargo escalonado en dinero sobre kWh y tabla de tarifas conocidos; existe incluso la version en codigo con Decimal. Definicion de LLM-026.
+  - id: E6
+    rule: LLM-001
+    component: pick_tariff_code
+    expect: present
+    rationale: >-
+      Salida en un conjunto cerrado de codigos con reglas explicitas sobre campos estructurados (clase, pico kW, solar, kWh); computable por codigo.
+  - id: E7
+    rule: ANY
+    component: explain_bill_to_customer
+    expect: absent
+    rationale: >-
+      Los importes se calculan en codigo con charge_in_code y el LLM solo redacta la explicacion; exclusion de LLM-026 (explicar un calculo hecho en codigo) y generacion de prosa para el cliente.
+  - id: E8
+    rule: ANY
+    component: draft_dispute_reply
+    expect: absent
+    rationale: >-
+      Respuesta empatica abierta a una disputa; tono y contenido dependen del texto del cliente. Generacion abierta, LLM justificado.
+  - id: E9
+    rule: ANY
+    component: review_high_usage_complaint
+    expect: absent
+    rationale: >-
+      Pondera un mensaje libre del cliente contra series de consumo para elegir la explicacion mas plausible; es juicio sobre lenguaje natural con numeros como apoyo, no una regla explicita (exclusion de LLM-001) y no es calculo (los kWh ya estan validados).
+  - id: E10
+    rule: ANY
+    component: summarize_rate_case_filing
+    expect: absent
+    rationale: >-
+      Resumen de un documento regulatorio completo; el documento es el objeto de la tarea (exclusion de LLM-004).

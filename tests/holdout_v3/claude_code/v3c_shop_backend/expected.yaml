@@ -1,0 +1,76 @@
+fixture: v3c_shop_backend
+description: Configuración Claude Code del backend de una tienda online con agentes de pedidos, pagos, fraude y migraciones.
+labeled_by: holdout-v3 author (claude_code A)
+expectations:
+  - id: E1
+    rule: LLM-001
+    component: order-router
+    expect: present
+    rationale: >-
+      Elige una cola de un conjunto cerrado con reglas explícitas sobre campos estructurados (igualdad, umbral, pertenencia
+      a lista, prefijo), con orden de evaluación definido; computable por código.
+  - id: E2
+    rule: [LLM-009, LLM-003]
+    component: payment-webhook-extractor
+    expect: present
+    rationale: Extrae campos de un JSON de webhook con estructura estable; es json.loads, no comprensión de lenguaje (LLM-009).
+  - id: E3
+    rule: [LLM-002, LLM-011]
+    component: pricing-output-verifier
+    expect: present
+    rationale: >-
+      Vuelve a comprobar campos, tipos y rango de una salida que ya valida el modelo pydantic PriceQuote: verificación de
+      schema redundante (LLM-002) hecha por un LLM (LLM-011).
+  - id: E4
+    rule: ANY
+    component: fraud-case-investigator
+    expect: absent
+    rationale: >-
+      Incluye una lista de comandos permitidos (allowlist) pero el trabajo es correlacionar señales y sopesar explicaciones
+      inocentes en un dominio de riesgo; razonamiento justificado.
+  - id: E5
+    rule: ANY
+    component: payments-incident-debugger
+    expect: absent
+    rationale: Depuración que traza una secuencia de eventos y evalúa causas (idempotencia, carreras); comandos "safe" son allowlist.
+  - id: E6
+    rule: ANY
+    component: product-description-writer
+    expect: absent
+    rationale: Copy publicitario en la voz de marca; generación abierta, no formateo.
+  - id: E7
+    rule: ANY
+    component: catalog-migration-worker
+    expect: absent
+    rationale: >-
+      Tiene Edit/Write/Bash, pero el trabajo (planificar una migración segura y elegir semántica en call sites ambiguos)
+      requiere juicio; cc_procedure impide reemplazos mecánicos.
+  - id: E8
+    rule: ANY
+    component: release-readiness-coordinator
+    expect: absent
+    rationale: >-
+      Delega en tres subagentes en paralelo real y con contexto aislado (lecturas grandes) y fusiona los hallazgos;
+      cumple las exclusiones de LLM-012.
+  - id: E9
+    rule: LLM-017
+    component: deploy-checks
+    expect: present
+    rationale: Cuatro comandos encadenados con "then ... and finally", secuencia fija sin relación con la entrada; pasos, no allowlist.
+  - id: E10
+    rule: ANY
+    component: customer-reply
+    expect: absent
+    rationale: El id lo aporta la persona; el modelo debe leer la conversación, aplicar política y adaptar el tono; redacción empática abierta.
+  - id: E11
+    rule: ANY
+    component: sql-migration-review
+    expect: absent
+    rationale: Skill larga con pasos y comando de apoyo, pero cada pregunta requiere juicio sobre bloqueos, pérdida de datos y despliegues.
+  - id: E12
+    rule: [LLM-010, LLM-009, LLM-003]
+    component: sku-normalizer
+    expect: present
+    rationale: >-
+      Transformación de formato determinista de cadenas (mayúsculas, separadores, relleno con ceros) sin cambio semántico:
+      formateo (LLM-010), con entradas de formato regular.

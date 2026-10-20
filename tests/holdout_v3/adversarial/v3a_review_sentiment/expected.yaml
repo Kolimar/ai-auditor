@@ -1,0 +1,21 @@
+fixture: v3a_review_sentiment
+description: Puntuación del enfado de un huésped a partir de reseñas en texto libre, con umbral numérico en código.
+labeled_by: holdout-v3 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-001
+    component: score_guest_review
+    expect: absent
+    rationale: >-
+      Interpreta lenguaje natural libre (sarcasmo, matices); aunque la salida es un número, el criterio no es computable sobre entradas estructuradas (exclusión de LLM-001). El umbral está en código aparte.
+  - id: E2
+    rule: LLM-026
+    component: score_guest_review
+    expect: absent
+    rationale: >-
+      No es un cálculo exacto sobre valores conocidos, es una estimación sobre texto libre (exclusión de LLM-026).
+  - id: E3
+    rule: ANY
+    component: route_review
+    expect: absent
+    rationale: Función sin llamada LLM, solo compara un umbral.

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "bigquery": {
+      "command": "npx",
+      "args": ["-y", "@example/bigquery-mcp", "--project", "acme-analytics", "--read-only"]
+    },
+    "airflow": {
+      "command": "uvx",
+      "args": ["airflow-mcp-server", "--base-url", "https://airflow.internal.example.com"]
+    }
+  }
+}

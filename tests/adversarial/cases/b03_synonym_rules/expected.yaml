@@ -1,0 +1,16 @@
+fixture: b03_synonym_rules
+description: Reglas explicitas con sinonimos poco habituales en ingles y espanol.
+labeled_by: red-team
+expectations:
+  - id: E1
+    rule: LLM-001
+    component: flag_account
+    expect: present
+    rationale: >-
+      LLM-001 "Es": umbrales numericos y pertenencia a lista sobre entradas estructuradas, salida cerrada de 3 colores.
+  - id: E2
+    rule: LLM-001
+    component: prioridad_pago
+    expect: present
+    rationale: >-
+      LLM-001 "Es": reglas completas (monto, dias) con salida cerrada; redactadas como "cuando el monto rebase".

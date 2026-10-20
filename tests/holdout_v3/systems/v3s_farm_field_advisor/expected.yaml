@@ -1,0 +1,58 @@
+fixture: v3s_farm_field_advisor
+description: Asistente agronomico y jobs de campo para una finca de frutales (RAG con Chroma/LangChain, Gemini para sensores, riego, fotos y cosecha).
+labeled_by: holdout_v3 author (sonnet), written against docs/RULES.md
+expectations:
+  - id: E1
+    rule: LLM-016
+    component: agronomy_qa
+    expect: present
+    rationale: >-
+      Recupera 25 fragmentos con similarity_search(k=25) sin reranking y los concatena enteros en el prompt de una pregunta puntual; top_k alto sin reranking segun LLM-016.
+  - id: E2
+    rule: LLM-015
+    component: write_field_brief
+    expect: present
+    rationale: >-
+      La consulta ("standard drip irrigation guidance...") y el indice son constantes e independientes de la variable del bucle `field`, pero la busqueda se repite en cada vuelta; la recuperacion es invariante (definicion de LLM-015).
+  - id: E3
+    rule: LLM-024
+    component: write_field_brief
+    expect: optional
+    rationale: >-
+      Un job sobre una lista de parcelas con llamadas sincronas podria usar batch, pero el tamano de la lista es pequeno y puede ser interactivo; caso limite.
+  - id: E4
+    rule: LLM-009
+    component: read_sensor_payload
+    expect: present
+    rationale: >-
+      El documento es JSON del gateway con claves estables; extraer tres campos es json.loads. LLM-009 incluye JSON como estructura legible por maquina.
+  - id: E5
+    rule: LLM-026
+    component: compute_irrigation_volume
+    expect: present
+    rationale: >-
+      Se dan todos los valores y la formula (et0*kc, 10 m3 por mm y ha) y se pide un numero exacto; calculo determinista delegado al LLM, con un modelo pro.
+  - id: E6
+    rule: ANY
+    component: answer_from_regional_sources
+    expect: absent
+    rationale: >-
+      El bucle recorre un indice distinto por cultivo (collection guide_<crop>) con k=3; exclusion explicita de LLM-015 (misma consulta contra otro indice) y contexto pequeno, sin LLM-016.
+  - id: E7
+    rule: ANY
+    component: diagnose_leaf_photo
+    expect: absent
+    rationale: >-
+      Interpretacion multimodal de una foto mas notas libres con salida abierta razonada; no es clasificacion de texto estrecha ni tarea determinista.
+  - id: E8
+    rule: ANY
+    component: plan_harvest_window
+    expect: absent
+    rationale: >-
+      Razonamiento multi-paso con restricciones competidoras (madurez, lluvia, cuadrilla) y justificacion de compromisos: excluido de LLM-003 y LLM-001 (el prompt pide criterio, no reglas completas).
+  - id: E9
+    rule: ANY
+    component: translate_advisory
+    expect: absent
+    rationale: >-
+      Traduccion; LLM-010 excluye explicitamente la traduccion como no-formateo. Prosa libre, un solo paso.

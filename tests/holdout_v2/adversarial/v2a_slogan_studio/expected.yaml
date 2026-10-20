@@ -1,0 +1,11 @@
+fixture: v2a_slogan_studio
+description: Generador de eslóganes con ejemplos few-shot de estilo.
+labeled_by: holdout-v2 adversarial author
+expectations:
+  - id: E1
+    rule: [LLM-019, LLM-003, LLM-018]
+    component: write_slogan
+    expect: absent
+    rationale: >-
+      Los ejemplos few-shot muestran estilo, no un mapeo entrada-salida estable (cada salida es creativa y distinta);
+      generación abierta, no clasificación estrecha, por lo que LLM-019 y LLM-018 no aplican.

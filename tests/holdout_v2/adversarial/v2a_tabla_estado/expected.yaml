@@ -1,0 +1,16 @@
+fixture: v2a_tabla_estado
+description: Servicio de renderizado de tablas, clase asíncrona con el prompt construido en un método auxiliar.
+labeled_by: holdout-v2 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-010
+    component: render_markdown
+    expect: present
+    rationale: >-
+      Transforma registros en una tabla Markdown sin cambio semántico (el prompt prohíbe cambiar valores); formateo puro
+      que código hace sin error.
+  - id: E2
+    rule: ANY
+    component: explain_anomalies
+    expect: absent
+    rationale: Análisis de anomalías con notas en texto libre; razonamiento abierto justificado.

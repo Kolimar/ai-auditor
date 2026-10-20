@@ -1,0 +1,16 @@
+fixture: v2a_facturas_iva
+description: Cálculo de totales de factura en español con líneas como dataclasses.
+labeled_by: holdout-v2 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-026
+    component: calcular_total_factura
+    expect: present
+    rationale: >-
+      Pide al LLM base imponible, IVA y total exactos sobre valores ya conocidos; es aritmética que el código hace con
+      Decimal sin error.
+  - id: E2
+    rule: ANY
+    component: redactar_cobro
+    expect: absent
+    rationale: Redacción cordial de prosa personalizada; LLM justificado.

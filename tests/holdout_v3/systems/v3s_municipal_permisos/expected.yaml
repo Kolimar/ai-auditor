@@ -1,0 +1,52 @@
+fixture: v3s_municipal_permisos
+description: Tramitacion de licencias de obra menor y atencion ciudadana de un ayuntamiento con OpenAI Agents SDK; prompts en espanol.
+labeled_by: holdout_v3 author (sonnet), written against docs/RULES.md
+expectations:
+  - id: E1
+    rule: [LLM-006, LLM-012]
+    component: Reenviador
+    expect: present
+    rationale: >-
+      Agente pasarela: sus instrucciones dicen que recibe la solicitud ya clasificada y la pasa tal cual al agente de obras; no aporta herramientas, fuente de datos ni modelo distinto. LLM-006 (agente pass-through) y LLM-012 (intermediario que solo reenvia; las herramientas del delegado no lo justifican a el).
+  - id: E2
+    rule: LLM-026
+    component: CalculadoraTasas
+    expect: present
+    rationale: >-
+      Formula cerrada con importes y porcentajes conocidos (superficie*12,50 + 2 % + recargo + fijo); calculo exacto de dinero que el codigo haria sin error. Definicion de LLM-026.
+  - id: E3
+    rule: LLM-011
+    component: ValidadorExpediente
+    expect: present
+    rationale: >-
+      Pide al LLM comprobar presencia de campos, tipo numerico > 0, longitud de la referencia catastral y formato del DNI: validacion de schema pura (LLM-011), sin componente semantico.
+  - id: E4
+    rule: LLM-021
+    component: RedactorResolucion
+    expect: present
+    rationale: >-
+      El agente se invoca en un `while not ... CONFORME` que repite redactor/revisor sin contador de iteraciones ni max_turns acotante sobre el ciclo exterior; no espera a ninguna persona, asi que la exclusion de REPL no aplica.
+  - id: E5
+    rule: ANY
+    component: Recepcion
+    expect: absent
+    rationale: >-
+      Enruta segun el contenido libre del mensaje del ciudadano hacia agentes con herramientas distintas; la eleccion depende de lenguaje natural (exclusion de LLM-001 y LLM-017), y los delegados tienen herramientas propias (exclusion de LLM-012).
+  - id: E6
+    rule: ANY
+    component: AsesorObras
+    expect: absent
+    rationale: >-
+      Agente con herramientas de normativa y expediente cuya eleccion depende de la consulta; razona sobre casos individuales y cita articulos. Uso agentico legitimo.
+  - id: E7
+    rule: ANY
+    component: RevisorJuridico
+    expect: absent
+    rationale: >-
+      Critico con criterios y fuente distintos (articulos recuperados por herramienta) frente al redactor; exclusion de LLM-006 (verificacion distinta) y validacion semantica no cubierta por otro mecanismo (exclusion de LLM-002).
+  - id: E8
+    rule: ANY
+    component: AsistenteCiudadano
+    expect: absent
+    rationale: >-
+      El bucle `while True` espera `input()` en cada vuelta y la herramienta depende de la pregunta; exclusion explicita de LLM-021 (REPL de chat) y conversacion abierta.

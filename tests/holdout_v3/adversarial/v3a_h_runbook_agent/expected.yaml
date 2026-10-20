@@ -1,0 +1,9 @@
+fixture: v3a_h_runbook_agent
+description: Agente de diagnóstico de incidentes de infraestructura con herramienta de comandos.
+labeled_by: holdout-v3 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-021
+    component: run_runbook
+    expect: present
+    rationale: while True alrededor de un agente con herramientas; la única salida depende de que el modelo diga DONE y no hay máximo de iteraciones ni persona que espere en cada vuelta.

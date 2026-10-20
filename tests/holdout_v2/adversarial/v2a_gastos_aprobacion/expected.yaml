@@ -1,0 +1,16 @@
+fixture: v2a_gastos_aprobacion
+description: Aprobación de gastos con política en español, entrada como dataclass y modelo desde variable de entorno.
+labeled_by: holdout-v2 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-001
+    component: decidir_gasto
+    expect: present
+    rationale: >-
+      Elige entre tres alternativas cerradas con reglas completamente explícitas (recibo, umbrales de importe, igualdad de
+      categoría, días) sobre campos estructurados; computable por código.
+  - id: E2
+    rule: ANY
+    component: nota_al_empleado
+    expect: absent
+    rationale: Redacción personalizada que incorpora un comentario libre; reescritura de prosa justificada.

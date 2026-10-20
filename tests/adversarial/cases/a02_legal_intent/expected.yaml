@@ -1,0 +1,11 @@
+fixture: a02_legal_intent
+description: Clasificacion de clausulas por efecto juridico.
+labeled_by: red-team
+expectations:
+  - id: E1
+    rule: ANY
+    component: classify_clause_intent
+    expect: absent
+    rationale: >-
+      Salida cerrada pero la decision exige interpretar intencion legal (LLM-001 "No es": interpretar lenguaje natural).
+      LLM-003 "No es": dominios de alto riesgo sin evidencia runtime. Sin evidencia para bajar de modelo.

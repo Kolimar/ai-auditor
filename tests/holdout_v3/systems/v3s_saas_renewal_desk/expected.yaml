@@ -1,0 +1,59 @@
+fixture: v3s_saas_renewal_desk
+description: Herramientas de customer success para un SaaS B2B (enrutado de escalaciones, ingesta de uso, NPS, QBR y renovaciones) con Anthropic SDK y pydantic-ai.
+labeled_by: holdout_v3 author (sonnet), written against docs/RULES.md
+expectations:
+  - id: E1
+    rule: LLM-001
+    component: route_escalation
+    expect: present
+    rationale: >-
+      La salida elige entre cuatro colas cerradas y los criterios son reglas explicitas ordenadas sobre campos estructurados
+      (umbral de ARR, igualdad de tier, P1 > 0, dias a renovacion). Es la definicion de LLM-001; no hay lenguaje natural libre.
+  - id: E2
+    rule: LLM-009
+    component: parse_usage_export
+    expect: present
+    rationale: >-
+      La entrada es una linea CSV con columnas conocidas; extraer cinco campos es un split. LLM-009 lista CSV como estructura legible por maquina.
+  - id: E3
+    rule: LLM-026
+    component: estimate_expansion_arr
+    expect: present
+    rationale: >-
+      Prorrateo exacto de ARR (asientos x precio x meses / 12) sobre valores numericos ya conocidos; LLM-026 lo trata como calculo determinista delegado.
+  - id: E4
+    rule: [LLM-018, LLM-003]
+    component: nps_theme_agent
+    expect: present
+    rationale: >-
+      Clasificacion de comentario libre en seis temas cerrados (LLM-018) con un modelo de tier frontier (opus) para una salida de una etiqueta (LLM-003).
+  - id: E5
+    rule: LLM-024
+    component: nps_theme_agent
+    expect: optional
+    rationale: >-
+      El job nocturno recorre un CSV con llamadas sincronas, lo que encaja con LLM-024, pero el volumen es incierto y la regla es de oportunidad; se acepta cualquiera de las dos salidas.
+  - id: E6
+    rule: ANY
+    component: draft_qbr_narrative
+    expect: absent
+    rationale: >-
+      Generacion abierta y larga de un texto ejecutivo que interpreta metricas y objetivos; el LLM esta justificado (exclusion de LLM-003: generacion abierta larga).
+  - id: E7
+    rule: ANY
+    component: write_renewal_email
+    expect: absent
+    rationale: >-
+      Redaccion de un email de tono adaptado al sentimiento. Los re.sub posteriores solo limpian texto (exclusion de LLM-022: re.sub no cuenta como parseo de estructura).
+  - id: E8
+    rule: ANY
+    component: flag_churn_language
+    expect: absent
+    rationale: >-
+      Interpreta lenguaje natural libre en transcripciones (menciones implicitas de abandono); no es decision por reglas (exclusion de LLM-001) ni extraccion de campos formateados (exclusion de LLM-009).
+  - id: E9
+    rule: ANY
+    component: csm_copilot_repl
+    expect: absent
+    rationale: >-
+      Bucle de chat donde cada vuelta espera input() de una persona; exclusion explicita de LLM-021. La conversacion abierta justifica el LLM.

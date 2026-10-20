@@ -1,0 +1,77 @@
+fixture: v3c_oss_pytoolkit
+description: Configuración Claude Code de una librería Python de código abierto mantenida por voluntarios.
+labeled_by: holdout-v3 author (claude_code A)
+expectations:
+  - id: E1
+    rule: [LLM-003, LLM-018]
+    component: issue-labeler
+    expect: present
+    rationale: >-
+      Clasificación en cuatro etiquetas cerradas sobre texto libre, sin herramientas ni razonamiento, con opus. Salida
+      corta y cerrada (LLM-003); además es estrecha, candidata a modelo pequeño (LLM-018).
+  - id: E2
+    rule: [LLM-010, LLM-009]
+    component: changelog-formatter
+    expect: present
+    rationale: >-
+      Entrada JSON de gh con campos fijos; agrupar por etiqueta y rellenar una plantilla "- título (#n, @autor)" con
+      títulos literales es formateo sin cambio semántico. Tiene Edit pero la transformación es mecánica y acotada.
+  - id: E3
+    rule: ANY
+    component: pr-reviewer
+    expect: absent
+    rationale: Revisión de código con juicio sobre compatibilidad y tono; opus y Bash para leer el diff; tarea abierta.
+  - id: E4
+    rule: ANY
+    component: release-notes-writer
+    expect: absent
+    rationale: Escritura de prosa con explicación de rutas de actualización; reescritura de prosa no es formateo (exclusión de LLM-010).
+  - id: E5
+    rule: ANY
+    component: contributor-mentor
+    expect: absent
+    rationale: Respuesta empática dirigida a una persona, generación abierta.
+  - id: E6
+    rule: LLM-006
+    component: dependency-bump-reviewer
+    expect: present
+    rationale: >-
+      Mismo rol, herramientas y modelo que dependabot-pr-reviewer, con redacción apenas distinta; casi duplicados
+      que divergen levemente (se recomienda quedarse con una versión).
+  - id: E7
+    rule: LLM-006
+    component: dependabot-pr-reviewer
+    expect: optional
+    rationale: Contraparte de E6; el hallazgo de duplicado puede atribuirse a cualquiera de los dos.
+  - id: E8
+    rule: ANY
+    component: triage-issue
+    expect: absent
+    rationale: El número de issue lo introduce la persona y el modelo debe razonar sobre reproducibilidad, causa y respuesta; juicio.
+  - id: E9
+    rule: LLM-003
+    component: bump-version
+    expect: present
+    rationale: Edición mecánica de dos campos con valor dado, salida mínima, y fija model opus; tarea simple con modelo grande.
+  - id: E10
+    rule: LLM-017
+    component: check-docs-links
+    expect: present
+    rationale: Tres comandos en secuencia fija y sin dependencia del contenido ("A, then B, then C"); pasos, no allowlist.
+  - id: E11
+    rule: ANY
+    component: release-checklist
+    expect: absent
+    rationale: >-
+      Skill larga con comandos en pasos, pero decide el bump semántico leyendo PRs, distingue flakes de regresiones y pide
+      confirmación; requiere juicio (cc_procedure).
+  - id: E12
+    rule: ANY
+    component: docs-translator
+    expect: absent
+    rationale: Traducción con terminología y tono; excluida de LLM-010 (traducción no es formateo).
+  - id: E13
+    rule: ANY
+    component: CLAUDE.md
+    expect: absent
+    rationale: CLAUDE.md breve de raíz, contexto proporcionado.

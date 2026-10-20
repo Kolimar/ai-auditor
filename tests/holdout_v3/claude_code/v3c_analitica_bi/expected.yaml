@@ -1,0 +1,69 @@
+fixture: v3c_analitica_bi
+description: Espacio de trabajo de un equipo de BI (BigQuery, dbt, Tableau) con configuracion Claude Code en espanol.
+labeled_by: holdout-v3 author (Claude Code config, BI)
+expectations:
+  - id: E1
+    rule: ANY
+    component: analista-de-cohortes
+    expect: absent
+    rationale: Lista de comandos permitidos pero la tarea es investigacion con hipotesis multiples; esfuerzo alto.
+  - id: E2
+    rule: LLM-010
+    component: normalizador-de-fechas
+    expect: present
+    rationale: Conversion de formato de fechas dd/mm/aaaa a ISO en columnas identificadas por prefijo; transformacion mecanica acotada de ficheros aunque use Edit.
+  - id: E3
+    rule: LLM-026
+    component: conciliador-de-totales
+    expect: present
+    rationale: Sumas, IVA y porcentajes exactos sobre valores conocidos de un CSV; calculo determinista en codigo.
+  - id: E4
+    rule: ANY
+    component: redactor-de-informes
+    expect: absent
+    rationale: Redaccion narrativa abierta para directivos; generacion de prosa con tono.
+  - id: E5
+    rule: [LLM-003, LLM-018]
+    component: clasificador-de-peticiones
+    expect: present
+    rationale: Clasificacion de texto libre en cinco etiquetas cerradas con salida corta y sin razonamiento, usando opus; candidato a modelo pequeno.
+  - id: E6
+    rule: LLM-023
+    component: buscador-de-columnas
+    expect: present
+    rationale: Recibe dieciseis herramientas mcp__ cuando la tarea (buscar una columna en el esquema) usa una o dos; cada schema se inyecta en cada llamada.
+  - id: E7
+    rule: LLM-011
+    component: validar-esquema-export
+    expect: present
+    rationale: Comprueba columnas requeridas, formatos, tipos y rangos de un CSV; trabajo de schema puro.
+  - id: E8
+    rule: ANY
+    component: auditoria-de-dashboard
+    expect: absent
+    rationale: Procedimiento largo de auditoria con juicio sobre utilidad y presentacion; no es mecanico.
+  - id: E9
+    rule: ANY
+    component: revision-de-sql
+    expect: absent
+    rationale: Revision de logica SQL y reescritura con razonamiento sobre granularidad.
+  - id: E10
+    rule: LLM-017
+    component: refrescar-dashboards
+    expect: present
+    rationale: Tres comandos fijos en un bloque de codigo ejecutados en orden, sin dependencia del contenido de la entrada.
+  - id: E11
+    rule: ANY
+    component: explicar-variacion
+    expect: absent
+    rationale: Argumentos rellenados por el modelo y analisis de causas con juicio.
+  - id: E12
+    rule: ANY
+    component: resumen-semanal
+    expect: absent
+    rationale: Resumen de un documento (el documento es el objeto de la tarea); no es formateo.
+  - id: E13
+    rule: ANY
+    component: CLAUDE.md
+    expect: absent
+    rationale: Memoria raiz corta y pertinente.

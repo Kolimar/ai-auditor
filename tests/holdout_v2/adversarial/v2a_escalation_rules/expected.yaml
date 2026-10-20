@@ -1,0 +1,16 @@
+fixture: v2a_escalation_rules
+description: Enrutado de hilos de soporte con criterios redactados como umbrales pero sobre texto libre.
+labeled_by: holdout-v2 adversarial author
+expectations:
+  - id: E1
+    rule: ANY
+    component: route_thread
+    expect: absent
+    rationale: >-
+      Aunque el prompt usa un umbral ("más de dos veces"), las condiciones requieren interpretar lenguaje natural libre
+      (hostilidad, cancelación implícita o sarcástica). LLM-001 excluye decidir interpretando lenguaje natural libre.
+  - id: E2
+    rule: ANY
+    component: draft_reply
+    expect: absent
+    rationale: Generación empática abierta dirigida al cliente; el LLM está justificado.

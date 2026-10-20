@@ -1,0 +1,11 @@
+fixture: b06_constant_inputs
+description: Llamada con entradas totalmente constantes ejecutada en cada request.
+labeled_by: red-team
+expectations:
+  - id: E1
+    rule: [LLM-020, LLM-014]
+    component: render_shipping_summary
+    expect: present
+    rationale: >-
+      LLM-020 "Es": entradas estaticas sin variables runtime (SHIPPING_TIERS es constante) -> calcular offline.
+      LLM-014(b) tambien cuenta (misma entrada repetida). Aunque la salida sea prosa, la entrada es constante.

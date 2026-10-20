@@ -1,0 +1,52 @@
+fixture: v2s_clinic_desk
+description: Recepción administrativa de una clínica (sin diagnóstico) con OpenAI Agents SDK y la API Responses.
+labeled_by: holdout-v2 author (sistemas Python)
+expectations:
+  - id: E1
+    rule: ANY
+    component: Intake
+    expect: absent
+    rationale: >-
+      Agente conversacional con herramientas cuyo uso depende de lo que diga el paciente (LLM-017 excluye elección
+      dependiente de la entrada); hay conversación abierta y el LLM está justificado.
+  - id: E2
+    rule: LLM-017
+    component: Coverage Checker
+    expect: present
+    rationale: >-
+      Las instrucciones fijan la secuencia invariante check_coverage -> get_copay con los mismos argumentos
+      ("llama siempre primero a X"); puede hacerse en código antes del LLM.
+  - id: E3
+    rule: [LLM-006, LLM-012]
+    component: Front Desk Relay
+    expect: present
+    rationale: >-
+      Agente pass-through que reenvía el mensaje "exactamente como está" al Scheduler sin aportar información ni
+      herramientas distintas; es la definición de agente redundante y delegación innecesaria.
+  - id: E4
+    rule: ANY
+    component: Scheduler
+    expect: absent
+    rationale: >-
+      Agente con herramientas distintas (find_slots, book_slot) que negocia preferencias del paciente; aporta
+      herramientas propias y la elección depende del contenido (exclusión de LLM-012 y LLM-017).
+  - id: E5
+    rule: LLM-021
+    component: chase_unpaid_invoices
+    expect: present
+    rationale: >-
+      Bucle while True alrededor de Runner.run sin cota de iteraciones y sin max_turns; la salida solo termina si el
+      modelo escribe una frase concreta (LLM-021).
+  - id: E6
+    rule: LLM-001
+    component: cancellation_policy_decision
+    expect: present
+    rationale: >-
+      Política con umbrales numéricos y pertenencia a lista sobre entradas estructuradas y salida de tres etiquetas
+      cerradas; computable por código (LLM-001).
+  - id: E7
+    rule: ANY
+    component: write_reminder_text
+    expect: absent
+    rationale: >-
+      Redacción de SMS cálido integrando notas libres; reescritura de prosa (tono), excluida de LLM-010 como formateo.

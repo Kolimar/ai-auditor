@@ -1,0 +1,59 @@
+fixture: v3c_firmware_motorctl
+description: Firmware de controlador de motor STM32/FreeRTOS con herramientas de Claude Code para banco de pruebas.
+labeled_by: holdout-v3 author (Claude Code config, firmware)
+expectations:
+  - id: E1
+    rule: ANY
+    component: rtos-deadlock-investigator
+    expect: absent
+    rationale: Lista de comandos permitidos en el cuerpo, pero la tarea es investigar con razonamiento multi-hipotesis; esfuerzo alto.
+  - id: E2
+    rule: LLM-009
+    component: register-map-extractor
+    expect: present
+    rationale: Extrae direcciones de ficheros XML SVD con estructura estable y las vuelca a un header; transformacion mecanica acotada aunque tenga Write.
+  - id: E3
+    rule: LLM-001
+    component: pin-conflict-checker
+    expect: present
+    rationale: Veredicto PASS/FAIL con criterios completamente explicitos sobre un CSV estructurado (duplicados, rango AF, nombres); computable por codigo.
+  - id: E4
+    rule: LLM-026
+    component: timing-budget-calculator
+    expect: present
+    rationale: Calcula divisores y prescalers con formulas exactas sobre valores conocidos; calculo en codigo sin error.
+  - id: E5
+    rule: ANY
+    component: driver-porter
+    expect: absent
+    rationale: Portado de drivers entre familias con rediseno y decisiones; herramientas de edicion pero trabajo de juicio.
+  - id: E6
+    rule: LLM-017
+    component: flash-and-verify
+    expect: present
+    rationale: Cuatro comandos fijos numerados como pasos (compilar, flashear, leer log, comprobar); secuencia invariante ejecutable por script.
+  - id: E7
+    rule: ANY
+    component: hardfault-analysis
+    expect: absent
+    rationale: Procedimiento largo con comandos, pero requiere interpretar volcados y razonar causas; no es secuencia fija.
+  - id: E8
+    rule: [LLM-010, LLM-009]
+    component: test-report
+    expect: present
+    rationale: Convierte lineas de log de formato fijo Unity en tabla Markdown sin cambio semantico.
+  - id: E9
+    rule: ANY
+    component: review-isr
+    expect: absent
+    rationale: Revision con criterio y argumento rellenado por el modelo.
+  - id: E10
+    rule: ANY
+    component: CLAUDE.md
+    expect: absent
+    rationale: Memoria raiz muy pequena; el CLAUDE.md anidado en firmware/drivers es grande pero solo se carga en ese subarbol (exclusion de LLM-004).
+  - id: E11
+    rule: LLM-013
+    component: "*system*"
+    expect: optional
+    rationale: Todos los agentes declaran opus pese a perfiles heterogeneos (extractor y calculadora simples frente a investigacion compleja); caso limite porque la tarea de varios es de alto riesgo embebido.

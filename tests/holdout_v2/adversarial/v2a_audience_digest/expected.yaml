@@ -1,0 +1,16 @@
+fixture: v2a_audience_digest
+description: Boletines de despliegue adaptados por audiencia y explicación de importes calculados en código.
+labeled_by: holdout-v2 adversarial author
+expectations:
+  - id: E1
+    rule: ANY
+    component: rewrite_for_audience
+    expect: absent
+    rationale: >-
+      Parece formateo de datos ya disponibles, pero adapta registro, jerga y contenido según la audiencia; reescritura de
+      prosa/tono excluida de LLM-010.
+  - id: E2
+    rule: [LLM-026, LLM-010]
+    component: explain_invoice_total
+    expect: absent
+    rationale: El total lo calcula el código con Decimal; el LLM solo explica el cálculo, excluido de LLM-026.

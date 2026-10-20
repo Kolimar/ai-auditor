@@ -1,0 +1,14 @@
+fixture: v3a_h_invoice_sum
+description: Cálculo de totales de facturas de un punto de venta de restaurante.
+labeled_by: holdout-v3 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-026
+    component: grand_total_usd
+    expect: present
+    rationale: Pide sumar productos, aplicar IVA y convertir divisa sobre valores ya conocidos y estructurados; cálculo exacto que el código haría sin error. La redacción en tercera persona descriptiva no cambia la naturaleza.
+  - id: E2
+    rule: ANY
+    component: thank_you_note
+    expect: absent
+    rationale: Redacción cálida de una nota; el importe ya viene calculado en código.

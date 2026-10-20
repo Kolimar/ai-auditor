@@ -1,0 +1,11 @@
+fixture: a07_json_free_text
+description: Entrada JSON cuyo campo clave es texto libre.
+labeled_by: red-team
+expectations:
+  - id: E1
+    rule: [LLM-009, LLM-001, LLM-010]
+    component: route_complaint
+    expect: absent
+    rationale: >-
+      La estructura JSON es solo contenedor; el campo "complaint" es prosa libre. LLM-009 "No es: prosa libre";
+      LLM-001 "No es: interpretar lenguaje natural libre". Ya usa modelo mini.

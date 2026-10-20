@@ -1,0 +1,16 @@
+fixture: v2a_pedidos_csv
+description: Ingesta de pedidos exportados como CSV con prompt en español ensamblado desde otro módulo.
+labeled_by: holdout-v2 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-009
+    component: leer_pedido
+    expect: present
+    rationale: >-
+      Cada fila es CSV con columnas fijas y formatos regulares (fecha, importe, id); el LLM extrae campos de una entrada
+      legible por máquina, lo que es csv.reader.
+  - id: E2
+    rule: ANY
+    component: responder_reclamo
+    expect: absent
+    rationale: Respuesta empática abierta a un cliente; LLM justificado.

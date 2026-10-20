@@ -1,0 +1,13 @@
+fixture: b01_ask_helper_parser
+description: Parser LLM oculto tras helper generico ask().
+labeled_by: red-team
+expectations:
+  - id: E1
+    rule: LLM-009
+    component: read_order_fields
+    expect: present
+    rationale: >-
+      LLM-009 "Es": extraer campos de JSON de API con estructura fija. NOTA: la llamada fisica esta en ask()
+      (llm_utils.py); se etiqueta la funcion que construye el prompt. Esperamos que el auditor atribuya el hallazgo
+      a read_order_fields (propagando entrada via grafo de flujo); si lo atribuye a ask se considera
+      desajuste de atribucion, no de deteccion.

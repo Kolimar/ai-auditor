@@ -1,0 +1,58 @@
+fixture: v2s_contratos_legal
+description: Operaciones legales en español; vencimientos, verificación de expedientes, resumen de cláusulas, consultas RAG y memorandos.
+labeled_by: holdout-v2 author (sistemas Python)
+expectations:
+  - id: E1
+    rule: LLM-001
+    component: clasificar_vencimiento
+    expect: present
+    rationale: >-
+      Los días restantes ya se calculan en código y el prompt define umbrales (<=30, <=90) y un booleano; salida cerrada
+      con reglas completamente explícitas, es el caso de LLM-001.
+  - id: E2
+    rule: [LLM-011, LLM-002]
+    component: verificar_formato_expediente
+    expect: present
+    rationale: >-
+      Se pide al LLM comprobar campos requeridos, tipos, formato de fecha y rango del monto sobre JSON; es trabajo de
+      schema (LLM-011), no validación semántica.
+  - id: E3
+    rule: ANY
+    component: resumir_clausulas
+    expect: absent
+    rationale: >-
+      Resumir el contrato adjunto; el documento es el objeto de la tarea (exclusión de LLM-004) y el resumen exige
+      comprensión jurídica.
+  - id: E4
+    rule: ANY
+    component: extraer_partes_contrato
+    expect: absent
+    rationale: >-
+      Extracción desde prosa contractual con redacción variable, con modelo pequeño y entrada acotada; exclusión de
+      LLM-009 y ya cumple LLM-018 (no es modelo grande).
+  - id: E5
+    rule: ANY
+    component: traducir_aviso
+    expect: absent
+    rationale: Traducción; LLM-010 la excluye expresamente de formateo. Modelo pequeño.
+  - id: E6
+    rule: LLM-016
+    component: responder_consulta_politica
+    expect: present
+    rationale: >-
+      Recupera k=40 fragmentos sin reranking y los inyecta enteros para una pregunta puntual; inyección masiva de RAG
+      (LLM-016).
+  - id: E7
+    rule: LLM-015
+    component: redactar_memo
+    expect: present
+    rationale: >-
+      La misma consulta (resumen_asunto, misma fuente) se vuelve a ejecutar en cada iteración del loop de secciones
+      sin reutilizar el resultado.
+  - id: E8
+    rule: ANY
+    component: auditar_borrador
+    expect: absent
+    rationale: >-
+      Verificación semántica de cumplimiento contra política (exclusión de LLM-002: cumplimiento de políticas); ninguna
+      otra validación lo cubre.

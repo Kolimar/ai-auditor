@@ -1,0 +1,11 @@
+fixture: a05_factcheck_validate
+description: Verificacion de afirmaciones contra fuentes con palabras validate/verify.
+labeled_by: red-team
+expectations:
+  - id: E1
+    rule: [LLM-002, LLM-011, LLM-010]
+    component: validate_article_claims
+    expect: absent
+    rationale: >-
+      LLM-002/LLM-011 "No es": fact-checking contra fuentes y grounding. Pese a "validate"/"verify" y salida JSON,
+      no hay chequeo de schema; es validacion semantica.

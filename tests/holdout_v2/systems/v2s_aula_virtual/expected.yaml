@@ -1,0 +1,59 @@
+fixture: v2s_aula_virtual
+description: Plataforma educativa en español con notas, foro, tutoría, correcciones y reportes semanales (Google GenAI y LangChain).
+labeled_by: holdout-v2 author (sistemas Python)
+expectations:
+  - id: E1
+    rule: LLM-026
+    component: calcular_nota_final
+    expect: present
+    rationale: >-
+      Media ponderada con porcentajes fijos, resta condicional y redondeo sobre valores ya conocidos; cálculo exacto que
+      LLM-026 manda hacer en código.
+  - id: E2
+    rule: [LLM-003, LLM-018]
+    component: clasificar_pregunta_foro
+    expect: present
+    rationale: >-
+      Clasificación de texto libre en tres etiquetas cerradas, entrada corta, con modelo pro; tarea simple para un
+      modelo grande (LLM-003) y candidata a modelo pequeño (LLM-018).
+  - id: E3
+    rule: LLM-006
+    component: condensar_resumen
+    expect: present
+    rationale: >-
+      Rehace el trabajo de resumir_leccion: "resume el resumen" sin aportar fuente ni perspectiva nueva, el ejemplo
+      literal de LLM-006.
+  - id: E4
+    rule: ANY
+    component: resumir_leccion
+    expect: absent
+    rationale: Resumen de una transcripción; el documento es el objeto de la tarea (exclusión de LLM-004).
+  - id: E5
+    rule: ANY
+    component: explicar_paso_a_paso
+    expect: absent
+    rationale: >-
+      El razonamiento paso a paso se muestra al estudiante, que es el producto; exclusión explícita de LLM-007
+      (razonamiento mostrado al usuario).
+  - id: E6
+    rule: ANY
+    component: responder_con_materiales
+    expect: absent
+    rationale: RAG con k=4 fragmentos para una pregunta puntual; volumen razonable, fuera de la definición de LLM-016.
+  - id: E7
+    rule: ANY
+    component: corregir_ensayo
+    expect: absent
+    rationale: Retroalimentación pedagógica sobre prosa con rúbrica; juicio y generación abierta, el ensayo es el objeto.
+  - id: E8
+    rule: ANY
+    component: generar_ejercicios
+    expect: absent
+    rationale: Generación creativa abierta de ejercicios con temperatura alta; no es determinista ni de salida cerrada.
+  - id: E9
+    rule: LLM-024
+    component: generar_reportes_semanales
+    expect: present
+    rationale: >-
+      Script de cron no interactivo que recorre unos 12 000 alumnos con llamadas síncronas y escribe archivos; la
+      latencia no importa, aplica Batch API (LLM-024).

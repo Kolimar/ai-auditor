@@ -1,0 +1,16 @@
+fixture: v2a_lookup_agent
+description: Agente de soporte con herramienta forzada leída desde un diccionario de configuración.
+labeled_by: holdout-v2 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-017
+    component: load_profile
+    expect: present
+    rationale: >-
+      tool_choice está forzado a una herramienta concreta (get_account_profile vía configuración) y el único dato es el
+      id; la llamada es invariante y puede hacerse en código.
+  - id: E2
+    rule: LLM-017
+    component: handle_message
+    expect: absent
+    rationale: tool_choice auto con varias herramientas; la elección depende del contenido del mensaje.

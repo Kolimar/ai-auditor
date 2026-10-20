@@ -1,0 +1,20 @@
+fixture: v3a_tax_qa_cache
+description: Preguntas y respuestas sobre un código tributario largo, con cache de prefijo y memoización.
+labeled_by: holdout-v3 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-014
+    component: answer_question
+    expect: absent
+    rationale: >-
+      El prefijo grande lleva cache_control y la función determinista está memoizada con lru_cache; ya hay caching (exclusión de LLM-014).
+  - id: E2
+    rule: LLM-005
+    component: answer_question
+    expect: absent
+    rationale: El bloque grande usa prompt caching de prefijo (exclusión de LLM-005).
+  - id: E3
+    rule: LLM-004
+    component: answer_question
+    expect: absent
+    rationale: El código tributario es la base de conocimiento de la tarea de consulta, no contexto superfluo.

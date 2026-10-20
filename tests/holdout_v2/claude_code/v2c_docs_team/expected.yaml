@@ -1,0 +1,59 @@
+fixture: v2c_docs_team
+description: Equipo de documentación de desarrolladores con redactores, editores, traductor y utilidades de formato.
+labeled_by: holdout-v2 author (claude_code)
+expectations:
+  - id: E1
+    rule: ANY
+    component: tech-writer
+    expect: absent
+    rationale: Generación abierta de documentación a partir de notas con verificación contra código; razonamiento y redacción. LLM-000.
+  - id: E2
+    rule: LLM-006
+    component: style-editor
+    expect: optional
+    rationale: Casi duplicado de copy-polisher (mismo rol, mismo modelo, misma herramienta); no se sabe cuál de los dos se marcará, por eso ambos son optional.
+  - id: E3
+    rule: LLM-006
+    component: copy-polisher
+    expect: optional
+    rationale: Ver E2; el par es redundante pero cualquiera de los dos puede ser el señalado.
+  - id: E4
+    rule: [LLM-006, LLM-012]
+    component: doc-request-router
+    expect: present
+    rationale: Agente pass-through que solo reenvía la petición sin cambios a tech-writer y devuelve la respuesta; no aporta herramientas, modelo ni aislamiento distintos.
+  - id: E5
+    rule: ANY
+    component: spanish-translator
+    expect: absent
+    rationale: Traducción; LLM-010 excluye explícitamente la traducción. Glosario y conservación de código requieren comprensión del texto.
+  - id: E6
+    rule: [LLM-003, LLM-010]
+    component: toc-builder
+    expect: present
+    rationale: Extrae encabezados y genera una lista de enlaces; transformación de presentación determinista (regex) con opus y effort high para una tarea trivial.
+  - id: E7
+    rule: LLM-010
+    component: frontmatter-tidy
+    expect: present
+    rationale: Minúsculas, ordenación, reescritura de formato de fechas y orden de claves en front matter; formateo sin cambio semántico (LLM-010).
+  - id: E8
+    rule: LLM-004
+    component: content-guidelines
+    expect: present
+    rationale: La descripción (siempre cargada en contexto para decidir la invocación) es una lista enorme de temas, desproporcionada para lo que dispara; la definición de LLM-004 incluye instrucciones siempre cargadas desproporcionadas.
+  - id: E9
+    rule: ANY
+    component: draft-release-notes
+    expect: absent
+    rationale: El argumento es una versión; reescribe títulos de PR a frases para usuarios y agrupa por significado; prosa abierta, no formateo.
+  - id: E10
+    rule: ANY
+    component: summarize-meeting
+    expect: absent
+    rationale: Resumen de notas de reunión; LLM-010 excluye resumen; interpretación de texto libre.
+  - id: E11
+    rule: ANY
+    component: CLAUDE.md
+    expect: absent
+    rationale: Archivo de tres líneas, no es contexto excesivo.

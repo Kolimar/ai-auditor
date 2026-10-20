@@ -1,0 +1,58 @@
+fixture: v3s_realestate_listing_studio
+description: Estudio de anuncios inmobiliarios en español con 8 pasos LLM (OpenAI chat y LangChain con Chroma).
+labeled_by: holdout-v3 author A (Sonnet)
+expectations:
+  - id: E1
+    rule: LLM-009
+    component: extraer_datos_feed
+    expect: present
+    rationale: >-
+      La entrada es XML de un feed con etiquetas y atributos estables; volcarlo a JSON es parseo de estructura
+      legible por máquina (definición de LLM-009), no extracción desde prosa libre.
+  - id: E2
+    rule: [LLM-011, LLM-002]
+    component: validar_ficha
+    expect: present
+    rationale: >-
+      Se pide al LLM comprobar campos obligatorios, tipo numérico, rango entero y no vacío; es trabajo de schema
+      (LLM-011) que pydantic o jsonschema resolverían. No es validación semántica.
+  - id: E3
+    rule: LLM-016
+    component: responder_consulta_comprador
+    expect: present
+    rationale: >-
+      as_retriever con k=25 y los 25 fragmentos concatenados sin reranking para responder una pregunta puntual;
+      top_k alto sin reranking (LLM-016).
+  - id: E4
+    rule: LLM-015
+    component: enriquecer_anuncios
+    expect: present
+    rationale: >-
+      La misma consulta literal contra el mismo almacén se repite en cada vuelta del bucle; ni la consulta ni el
+      receptor dependen de la variable del loop, así que la recuperación es invariante (LLM-015).
+  - id: E5
+    rule: ANY
+    component: generar_descripcion
+    expect: absent
+    rationale: >-
+      Redacción comercial abierta con temperatura alta. Los reintentos de tenacity son solo por RateLimit y
+      conexión, resiliencia legítima excluida de LLM-008.
+  - id: E6
+    rule: ANY
+    component: moderar_texto_anuncio
+    expect: absent
+    rationale: >-
+      Cumplimiento de políticas (lenguaje discriminatorio, promesas de rentabilidad): validación semántica que la
+      exclusión de LLM-002 deja fuera, y requiere interpretar texto libre (no LLM-001).
+  - id: E7
+    rule: ANY
+    component: clasificar_consulta
+    expect: absent
+    rationale: >-
+      Clasificación de mensaje libre con un modelo ya pequeño (gpt-4o-mini) y salida cerrada; LLM-018 exige que el
+      modelo actual no sea pequeño y LLM-001 que los criterios sean reglas explícitas.
+  - id: E8
+    rule: ANY
+    component: traducir_anuncio_ingles
+    expect: absent
+    rationale: Traducción, excluida explícitamente de LLM-010; modelo pequeño.

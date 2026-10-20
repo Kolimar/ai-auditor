@@ -1,0 +1,14 @@
+fixture: v3a_listing_fanout
+description: Generación concurrente de textos promocionales de inmuebles a partir de notas del agente.
+labeled_by: holdout-v3 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-025
+    component: write_listing_blurb
+    expect: absent
+    rationale: Las llamadas ya se lanzan en paralelo con asyncio.gather y semáforo; no son secuenciales (LLM-025).
+  - id: E2
+    rule: ANY
+    component: write_listing_blurb
+    expect: absent
+    rationale: Generación creativa de prosa a partir de notas libres con temperatura alta; el LLM está justificado.

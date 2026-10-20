@@ -1,0 +1,16 @@
+fixture: v3a_budget_loop
+description: Agente de investigación jurídica con herramientas, acotado por presupuesto de tokens y plazo.
+labeled_by: holdout-v3 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-021
+    component: research_until_budget
+    expect: absent
+    rationale: >-
+      El loop está acotado por un presupuesto de tokens y un plazo en tiempo real; no es un loop sin cota (LLM-021 exige ausencia de límite).
+  - id: E2
+    rule: ANY
+    component: research_until_budget
+    expect: absent
+    rationale: >-
+      Agente con herramientas de búsqueda y lectura en horizonte largo y razonamiento jurídico abierto; el modelo grande está justificado (exclusión de LLM-003).

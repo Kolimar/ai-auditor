@@ -1,0 +1,20 @@
+fixture: v2a_entity_service
+description: Servicio de extracción de entidades con reintentos ante JSON inválido, clase con configuración por defecto.
+labeled_by: holdout-v2 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-008
+    component: extract_entities
+    expect: present
+    rationale: >-
+      Reintenta la llamada cuando json.loads falla o faltan claves (fallo de formato) en lugar de usar structured outputs.
+  - id: E2
+    rule: LLM-022
+    component: extract_entities
+    expect: present
+    rationale: Parsea con json.loads la salida en texto libre sin structured outputs ni decodificación restringida.
+  - id: E3
+    rule: ANY
+    component: headline
+    expect: absent
+    rationale: Generación creativa abierta; LLM justificado.

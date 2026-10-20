@@ -1,0 +1,10 @@
+fixture: a06_localize_rewrite
+description: Traduccion con localizacion disfrazada de convert/format.
+labeled_by: red-team
+expectations:
+  - id: E1
+    rule: [LLM-010, LLM-003]
+    component: convert_copy_to_mx
+    expect: absent
+    rationale: >-
+      LLM-010 "No es: reescritura de prosa (tono), traduccion". Adaptacion cultural y tono; generacion creativa.

@@ -1,0 +1,60 @@
+fixture: support_triage
+description: Pipeline de triage de tickets de soporte (Anthropic SDK) con 6 pasos LLM y un único modelo para todo.
+labeled_by: golden-author-1
+expectations:
+  - id: E1
+    rule: LLM-001
+    component: assign_priority
+    expect: present
+    rationale: >-
+      La prioridad se decide con cinco reglas explícitas sobre campos estructurados (outage_flag, plan_tier,
+      sla_hours_remaining, open_tickets_30d, refund_amount) y salida cerrada P1/P2/P3. Es exactamente LLM-001.
+  - id: E2
+    rule: LLM-009
+    component: extract_ticket_fields
+    expect: present
+    rationale: >-
+      La entrada es un payload JSON de webhook con claves estables; extraer email, order_id, etc. es indexar el dict.
+      LLM-009 (estructura legible por máquina).
+  - id: E3
+    rule: [LLM-002, LLM-011]
+    component: confirm_reply_document
+    expect: present
+    rationale: >-
+      El documento ya pasó por el modelo pydantic ReplyDraft (longitud, enum de tono). Pedir al LLM que compruebe
+      campos, tipos y longitud duplica esa validación (LLM-002) y es trabajo de schema (LLM-011).
+  - id: E4
+    rule: ANY
+    component: draft_reply
+    expect: absent
+    rationale: Redacción empática abierta dirigida al cliente; generación de prosa, el LLM está justificado.
+  - id: E5
+    rule: ANY
+    component: review_reply_against_policy
+    expect: absent
+    rationale: >-
+      Parece una "validación" (LLM-002) pero es cumplimiento de políticas y grounding contra el registro del pedido;
+      la exclusión de LLM-002 la deja fuera. Ningún otro mecanismo la cubre.
+  - id: E6
+    rule: LLM-001
+    component: detect_escalation_risk
+    expect: absent
+    rationale: >-
+      Interpreta sarcasmo y enfado velado en lenguaje natural libre; es clasificación semántica, no reglas sobre campos.
+  - id: E7
+    rule: LLM-009
+    component: detect_escalation_risk
+    expect: absent
+    rationale: La entrada es prosa libre, no estructura legible por máquina.
+  - id: E8
+    rule: LLM-018
+    component: detect_escalation_risk
+    expect: optional
+    rationale: Clasificación estrecha sobre texto libre con modelo no pequeño; candidato a cascada solo con experimento.
+  - id: E9
+    rule: LLM-013
+    component: "*system*"
+    expect: present
+    rationale: >-
+      Un único modelo (claude-sonnet-5-5) sirve pasos triviales (etiqueta P1/P2/P3, extracción de JSON, comprobación
+      de schema) y pasos exigentes (redacción empática, revisión de política) sin routing por tier.

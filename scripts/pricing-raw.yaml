@@ -1,0 +1,730 @@
+retrieved_at: '2026-10-19'
+errors:
+- https://openai.com/api/pricing/ returned HTTP 403; OpenAI data taken from https://developers.openai.com/api/docs/pricing instead.
+- https://www.anthropic.com/pricing redirects (301) to claude.com/pricing; not fetched, platform.claude.com docs used instead.
+- 'Mistral: mistral.ai/pricing lists only one example price (Mistral Large); docs.mistral.ai models overview gives no prices (Mistral Large 4, Small 4, Medium 3.5 exist but unpriced, no API ids). Not included.'
+- Content was obtained through WebFetch summarization (small model) of official pages; 'evidence' strings are reconstructed table rows, not raw HTML. Retired Anthropic models (Opus 4.1, Opus 4, Sonnet 4,
+  Haiku 3.5), OpenAI legacy/fine-tune/older models, Gemini Priority/Flex tiers and Gemini robotics omitted. Anthropic API ids only where the models overview page states them.
+providers:
+- provider: anthropic
+  source_url: https://platform.claude.com/docs/en/about-claude/pricing
+  secondary_sources:
+  - https://platform.claude.com/docs/en/about-claude/models/overview
+  models:
+  - model: claude-fable-5-1
+    display_name: Claude Fable 5.1
+    input_per_mtok: 10
+    output_per_mtok: 50
+    cache_read_per_mtok: 0.25
+    cache_write_per_mtok: 12.5
+    cache_write_1h_per_mtok: 20
+    batch_input_per_mtok: 5
+    batch_output_per_mtok: 25
+    long_context_note: Claude 4.6 and later models (except Claude Haiku 5.5) and Claude Mythos Preview include the full 1M token context window at standard pricing.
+    evidence: 'Claude Fable 5.1 | 10 input | 5m cache writes 12.5 | 1h cache writes 20 | cache hits 0.25 | output 50; Batch: input 5 output 25 (cache hits priced at 0.025x base input)'
+  - model: null
+    display_name: Claude Mythos 5.1 (limited availability)
+    input_per_mtok: 10
+    output_per_mtok: 50
+    cache_read_per_mtok: 0.25
+    cache_write_per_mtok: 12.5
+    cache_write_1h_per_mtok: 20
+    batch_input_per_mtok: 5
+    batch_output_per_mtok: 25
+    long_context_note: Claude 4.6 and later models (except Claude Haiku 5.5) and Claude Mythos Preview include the full 1M token context window at standard pricing.
+    evidence: 'Claude Mythos 5.1 (limited availability) | 10 input | 5m cache writes 12.5 | 1h cache writes 20 | cache hits 0.25 | output 50; Batch: input 5 output 25 (cache hits 0.025x base) [API id not
+      stated on pages opened]'
+  - model: null
+    display_name: Claude Fable 5
+    input_per_mtok: 10
+    output_per_mtok: 50
+    cache_read_per_mtok: 1
+    cache_write_per_mtok: 12.5
+    cache_write_1h_per_mtok: 20
+    batch_input_per_mtok: 5
+    batch_output_per_mtok: 25
+    long_context_note: Claude 4.6 and later models (except Claude Haiku 5.5) and Claude Mythos Preview include the full 1M token context window at standard pricing.
+    evidence: 'Claude Fable 5 | 10 input | 5m cache writes 12.5 | 1h cache writes 20 | cache hits 1 | output 50; Batch: input 5 output 25 [API id not stated on pages opened]'
+  - model: null
+    display_name: Claude Mythos 5 (limited availability)
+    input_per_mtok: 10
+    output_per_mtok: 50
+    cache_read_per_mtok: 1
+    cache_write_per_mtok: 12.5
+    cache_write_1h_per_mtok: 20
+    batch_input_per_mtok: 5
+    batch_output_per_mtok: 25
+    long_context_note: Claude 4.6 and later models (except Claude Haiku 5.5) and Claude Mythos Preview include the full 1M token context window at standard pricing.
+    evidence: 'Claude Mythos 5 (limited availability) | 10 input | 5m cache writes 12.5 | 1h cache writes 20 | cache hits 1 | output 50; Batch: input 5 output 25 [API id not stated on pages opened]'
+  - model: claude-opus-5-5
+    display_name: Claude Opus 5.5
+    input_per_mtok: 4
+    output_per_mtok: 20
+    cache_read_per_mtok: 0.2
+    cache_write_per_mtok: 5
+    cache_write_1h_per_mtok: 8
+    batch_input_per_mtok: 2
+    batch_output_per_mtok: 10
+    long_context_note: Claude 4.6 and later models (except Claude Haiku 5.5) and Claude Mythos Preview include the full 1M token context window at standard pricing.
+    evidence: 'Claude Opus 5.5 | 4 input | 5m cache writes 5 | 1h cache writes 8 | cache hits 0.2 | output 20; Batch: input 2 output 10 (cache hits 0.05x base)'
+  - model: null
+    display_name: Claude Opus 5
+    input_per_mtok: 5
+    output_per_mtok: 25
+    cache_read_per_mtok: 0.5
+    cache_write_per_mtok: 6.25
+    cache_write_1h_per_mtok: 10
+    batch_input_per_mtok: 2.5
+    batch_output_per_mtok: 12.5
+    long_context_note: Claude 4.6 and later models (except Claude Haiku 5.5) and Claude Mythos Preview include the full 1M token context window at standard pricing.
+    evidence: 'Claude Opus 5 | 5 input | 5m cache writes 6.25 | 1h cache writes 10 | cache hits 0.5 | output 25; Batch: input 2.5 output 12.5 [API id not stated on pages opened]'
+  - model: null
+    display_name: Claude Opus 4.8
+    input_per_mtok: 5
+    output_per_mtok: 25
+    cache_read_per_mtok: 0.5
+    cache_write_per_mtok: 6.25
+    cache_write_1h_per_mtok: 10
+    batch_input_per_mtok: 2.5
+    batch_output_per_mtok: 12.5
+    long_context_note: Claude 4.6 and later models (except Claude Haiku 5.5) and Claude Mythos Preview include the full 1M token context window at standard pricing.
+    evidence: 'Claude Opus 4.8 | 5 input | 5m cache writes 6.25 | 1h cache writes 10 | cache hits 0.5 | output 25; Batch: input 2.5 output 12.5 [API id not stated on pages opened]'
+  - model: null
+    display_name: Claude Opus 4.7
+    input_per_mtok: 5
+    output_per_mtok: 25
+    cache_read_per_mtok: 0.5
+    cache_write_per_mtok: 6.25
+    cache_write_1h_per_mtok: 10
+    batch_input_per_mtok: 2.5
+    batch_output_per_mtok: 12.5
+    long_context_note: Claude 4.6 and later models (except Claude Haiku 5.5) and Claude Mythos Preview include the full 1M token context window at standard pricing.
+    evidence: 'Claude Opus 4.7 | 5 input | 5m cache writes 6.25 | 1h cache writes 10 | cache hits 0.5 | output 25; Batch: input 2.5 output 12.5 [API id not stated on pages opened]'
+  - model: null
+    display_name: Claude Opus 4.6
+    input_per_mtok: 5
+    output_per_mtok: 25
+    cache_read_per_mtok: 0.5
+    cache_write_per_mtok: 6.25
+    cache_write_1h_per_mtok: 10
+    batch_input_per_mtok: 2.5
+    batch_output_per_mtok: 12.5
+    long_context_note: Claude 4.6 and later models (except Claude Haiku 5.5) and Claude Mythos Preview include the full 1M token context window at standard pricing.
+    evidence: 'Claude Opus 4.6 | 5 input | 5m cache writes 6.25 | 1h cache writes 10 | cache hits 0.5 | output 25; Batch: input 2.5 output 12.5 [API id not stated on pages opened]'
+  - model: null
+    display_name: Claude Opus 4.5
+    input_per_mtok: 5
+    output_per_mtok: 25
+    cache_read_per_mtok: 0.5
+    cache_write_per_mtok: 6.25
+    cache_write_1h_per_mtok: 10
+    batch_input_per_mtok: 2.5
+    batch_output_per_mtok: 12.5
+    long_context_note: null
+    evidence: 'Claude Opus 4.5 | 5 input | 5m cache writes 6.25 | 1h cache writes 10 | cache hits 0.5 | output 25; Batch: input 2.5 output 12.5 [API id not stated on pages opened]'
+  - model: claude-sonnet-5-5
+    display_name: Claude Sonnet 5.5
+    input_per_mtok: 2
+    output_per_mtok: 10
+    cache_read_per_mtok: 0.1
+    cache_write_per_mtok: 2.5
+    cache_write_1h_per_mtok: 4
+    batch_input_per_mtok: 1
+    batch_output_per_mtok: 5
+    long_context_note: Claude 4.6 and later models (except Claude Haiku 5.5) and Claude Mythos Preview include the full 1M token context window at standard pricing.
+    evidence: 'Claude Sonnet 5.5 | 2 input | 5m cache writes 2.5 | 1h cache writes 4 | cache hits 0.1 | output 10; Batch: input 1 output 5 (cache hits 0.05x base)'
+  - model: null
+    display_name: Claude Sonnet 5
+    input_per_mtok: 2
+    output_per_mtok: 10
+    cache_read_per_mtok: 0.2
+    cache_write_per_mtok: 2.5
+    cache_write_1h_per_mtok: 4
+    batch_input_per_mtok: 1
+    batch_output_per_mtok: 5
+    long_context_note: Claude 4.6 and later models (except Claude Haiku 5.5) and Claude Mythos Preview include the full 1M token context window at standard pricing.
+    evidence: 'Claude Sonnet 5 | 2 input | 5m cache writes 2.5 | 1h cache writes 4 | cache hits 0.2 | output 10; Batch: input 1 output 5 (footnote: $2/$10 introductory pricing is now standard; the increase
+      to $3/$15 on Sept 1 2026 will not occur) [API id not stated on pages opened]'
+  - model: null
+    display_name: Claude Sonnet 4.6
+    input_per_mtok: 3
+    output_per_mtok: 15
+    cache_read_per_mtok: 0.3
+    cache_write_per_mtok: 3.75
+    cache_write_1h_per_mtok: 6
+    batch_input_per_mtok: 1.5
+    batch_output_per_mtok: 7.5
+    long_context_note: Claude 4.6 and later models (except Claude Haiku 5.5) and Claude Mythos Preview include the full 1M token context window at standard pricing.
+    evidence: 'Claude Sonnet 4.6 | 3 input | 5m cache writes 3.75 | 1h cache writes 6 | cache hits 0.3 | output 15; Batch: input 1.5 output 7.5 [API id not stated on pages opened]'
+  - model: null
+    display_name: Claude Sonnet 4.5
+    input_per_mtok: 3
+    output_per_mtok: 15
+    cache_read_per_mtok: 0.3
+    cache_write_per_mtok: 3.75
+    cache_write_1h_per_mtok: 6
+    batch_input_per_mtok: 1.5
+    batch_output_per_mtok: 7.5
+    long_context_note: null
+    evidence: 'Claude Sonnet 4.5 | 3 input | 5m cache writes 3.75 | 1h cache writes 6 | cache hits 0.3 | output 15; Batch: input 1.5 output 7.5 [API id not stated on pages opened]'
+  - model: claude-haiku-5-5
+    display_name: Claude Haiku 5.5 (prompts up to 100,000 tokens)
+    input_per_mtok: 0.1
+    output_per_mtok: 0.5
+    cache_read_per_mtok: 0.01
+    cache_write_per_mtok: 0.125
+    cache_write_1h_per_mtok: 0.2
+    batch_input_per_mtok: 0.05
+    batch_output_per_mtok: 0.25
+    long_context_note: 'Priced by prompt length: a request whose prompt is over 100,000 tokens pays higher prices (prompt length counts all input tokens incl. cache reads/writes). Over-100k row listed separately.'
+    evidence: 'Claude Haiku 5.5 (prompts up to 100,000 tokens) | 0.1 input | 5m cache writes 0.125 | 1h cache writes 0.2 | cache hits 0.01 | output 0.5; Batch: input 0.05 output 0.25'
+  - model: claude-haiku-5-5
+    display_name: Claude Haiku 5.5 (prompts over 100,000 tokens)
+    input_per_mtok: 0.5
+    output_per_mtok: 2.5
+    cache_read_per_mtok: 0.05
+    cache_write_per_mtok: 0.625
+    cache_write_1h_per_mtok: 1
+    batch_input_per_mtok: 0.25
+    batch_output_per_mtok: 1.25
+    long_context_note: Applies to requests whose prompt is over 100,000 tokens.
+    evidence: 'Claude Haiku 5.5 (prompts over 100,000 tokens) | 0.5 input | 5m cache writes 0.625 | 1h cache writes 1 | cache hits 0.05 | output 2.5; Batch: input 0.25 output 1.25'
+  - model: null
+    display_name: Claude Haiku 4.5
+    input_per_mtok: 1
+    output_per_mtok: 5
+    cache_read_per_mtok: 0.1
+    cache_write_per_mtok: 1.25
+    cache_write_1h_per_mtok: 2
+    batch_input_per_mtok: 0.5
+    batch_output_per_mtok: 2.5
+    long_context_note: null
+    evidence: 'Claude Haiku 4.5 | 1 input | 5m cache writes 1.25 | 1h cache writes 2 | cache hits 0.1 | output 5; Batch: input 0.5 output 2.5 [API id not stated on pages opened]'
+- provider: openai
+  source_url: https://developers.openai.com/api/docs/pricing
+  models:
+  - model: gpt-6-astra
+    display_name: gpt-6-astra
+    input_per_mtok: 10
+    output_per_mtok: 50
+    cache_read_per_mtok: 1
+    cache_write_per_mtok: 12.5
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 5
+    batch_output_per_mtok: 25
+    long_context_note: 'For >272K input: input 20.00, cached 2.00, cache writes 25.00, output 75.00'
+    evidence: 'Standard short context (<=272K): gpt-6-astra | $10.00 | $1.00 | $12.50 | $50.00. Standard long context (>272K): gpt-6-astra | $20.00 | $2.00 | $25.00 | $75.00. Batch short: $5.00 in, $25.00
+      out (long: $10.00 / $37.50).'
+  - model: gpt-6.1-sol
+    display_name: gpt-6.1-sol
+    input_per_mtok: 2
+    output_per_mtok: 10
+    cache_read_per_mtok: 0.1
+    cache_write_per_mtok: 2.5
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 1
+    batch_output_per_mtok: 5
+    long_context_note: 'For >272K input: input 4.00, cached 0.20, cache writes 5.00, output 15.00'
+    evidence: 'Standard short context (<=272K): gpt-6.1-sol | $2.00 | $0.10 | $2.50 | $10.00. Standard long context (>272K): gpt-6.1-sol | $4.00 | $0.20 | $5.00 | $15.00. Batch short: $1.00 in, $5.00 out
+      (long: $2.00 / $7.50).'
+  - model: gpt-6-luna
+    display_name: gpt-6-luna
+    input_per_mtok: 0.1
+    output_per_mtok: 0.5
+    cache_read_per_mtok: 0.01
+    cache_write_per_mtok: 0.125
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 0.05
+    batch_output_per_mtok: 0.25
+    long_context_note: 'For >272K input: input 0.20, cached 0.02, cache writes 0.25, output 0.75'
+    evidence: 'Standard short context (<=272K): gpt-6-luna | $0.10 | $0.01 | $0.125 | $0.50. Standard long context (>272K): gpt-6-luna | $0.20 | $0.02 | $0.25 | $0.75. Batch short: $0.05 in, $0.25 out (long:
+      $0.10 / $0.375).'
+  - model: gpt-6-sol
+    display_name: gpt-6-sol
+    input_per_mtok: 2
+    output_per_mtok: 10
+    cache_read_per_mtok: 0.2
+    cache_write_per_mtok: 2.5
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 1
+    batch_output_per_mtok: 5
+    long_context_note: 'For >272K input: input 4.00, cached 0.40, cache writes 5.00, output 15.00'
+    evidence: 'Standard short context (<=272K): gpt-6-sol | $2.00 | $0.20 | $2.50 | $10.00. Standard long context (>272K): gpt-6-sol | $4.00 | $0.40 | $5.00 | $15.00. Batch short: $1.00 in, $5.00 out (long:
+      $2.00 / $7.50).'
+  - model: gpt-5.6-sol
+    display_name: gpt-5.6-sol
+    input_per_mtok: 4
+    output_per_mtok: 20
+    cache_read_per_mtok: 0.4
+    cache_write_per_mtok: 5
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 2
+    batch_output_per_mtok: 10
+    long_context_note: 'For >272K input: input 8.00, cached 0.80, cache writes 10.00, output 30.00'
+    evidence: 'Standard short context (<=272K): gpt-5.6-sol | $4.00 | $0.40 | $5.00 | $20.00. Standard long context (>272K): gpt-5.6-sol | $8.00 | $0.80 | $10.00 | $30.00. Batch short: $2.00 in, $10.00
+      out (long: $4.00 / $15.00).'
+  - model: gpt-5.6-terra
+    display_name: gpt-5.6-terra
+    input_per_mtok: 2
+    output_per_mtok: 12
+    cache_read_per_mtok: 0.2
+    cache_write_per_mtok: 2.5
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 1
+    batch_output_per_mtok: 6
+    long_context_note: 'For >272K input: input 4.00, cached 0.40, cache writes 5.00, output 18.00'
+    evidence: 'Standard short context (<=272K): gpt-5.6-terra | $2.00 | $0.20 | $2.50 | $12.00. Standard long context (>272K): gpt-5.6-terra | $4.00 | $0.40 | $5.00 | $18.00. Batch short: $1.00 in, $6.00
+      out (long: $2.00 / $9.00).'
+  - model: gpt-5.6-luna
+    display_name: gpt-5.6-luna
+    input_per_mtok: 0.2
+    output_per_mtok: 1.2
+    cache_read_per_mtok: 0.02
+    cache_write_per_mtok: 0.25
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 0.1
+    batch_output_per_mtok: 0.6
+    long_context_note: 'For >272K input: input 0.40, cached 0.04, cache writes 0.50, output 1.80'
+    evidence: 'Standard short context (<=272K): gpt-5.6-luna | $0.20 | $0.02 | $0.25 | $1.20. Standard long context (>272K): gpt-5.6-luna | $0.40 | $0.04 | $0.50 | $1.80. Batch short: $0.10 in, $0.60 out
+      (long: $0.20 / $0.90).'
+  - model: gpt-5.5
+    display_name: gpt-5.5
+    input_per_mtok: 5
+    output_per_mtok: 30
+    cache_read_per_mtok: 0.5
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 2.5
+    batch_output_per_mtok: 15
+    long_context_note: 'For >272K input: input 10.00, cached 1.00, output 45.00'
+    evidence: 'Standard short context (<=272K): gpt-5.5 (<272K) | $5.00 | $0.50 | - | $30.00. Standard long context (>272K): gpt-5.5 | $10.00 | $1.00 | - | $45.00. Batch short: $2.50 in, $15.00 out (long:
+      $5.00 / $22.50).'
+  - model: gpt-5.5-pro
+    display_name: gpt-5.5-pro
+    input_per_mtok: 30
+    output_per_mtok: 180
+    cache_read_per_mtok: null
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 15
+    batch_output_per_mtok: 90
+    long_context_note: 'For >272K input: input 60.00, output 270.00'
+    evidence: 'Standard short context (<=272K): gpt-5.5-pro (<272K) | $30.00 | - | - | $180.00. Standard long context (>272K): gpt-5.5-pro | $60.00 | - | - | $270.00. Batch short: $15.00 in, $90.00 out.'
+  - model: gpt-5.4
+    display_name: gpt-5.4
+    input_per_mtok: 2.5
+    output_per_mtok: 15
+    cache_read_per_mtok: 0.25
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 1.25
+    batch_output_per_mtok: 7.5
+    long_context_note: 'For >272K input: input 5.00, cached 0.50, output 22.50'
+    evidence: 'Standard short context (<=272K): gpt-5.4 (<272K) | $2.50 | $0.25 | - | $15.00. Standard long context (>272K): gpt-5.4 | $5.00 | $0.50 | - | $22.50. Batch short: $1.25 in, $7.50 out (long:
+      $2.50 / $11.25).'
+  - model: gpt-5.4-mini
+    display_name: gpt-5.4-mini
+    input_per_mtok: 0.75
+    output_per_mtok: 4.5
+    cache_read_per_mtok: 0.075
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 0.375
+    batch_output_per_mtok: 2.25
+    long_context_note: null
+    evidence: gpt-5.4-mini | $0.75 | $0.075 | - | $4.50; Batch $0.375 in / $2.25 out
+  - model: gpt-5.4-nano
+    display_name: gpt-5.4-nano
+    input_per_mtok: 0.2
+    output_per_mtok: 1.25
+    cache_read_per_mtok: 0.02
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 0.1
+    batch_output_per_mtok: 0.625
+    long_context_note: null
+    evidence: gpt-5.4-nano | $0.20 | $0.02 | - | $1.25; Batch $0.10 in / $0.625 out
+  - model: gpt-5.4-pro
+    display_name: gpt-5.4-pro
+    input_per_mtok: 30
+    output_per_mtok: 180
+    cache_read_per_mtok: null
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 15
+    batch_output_per_mtok: 90
+    long_context_note: 'For >272K input: input 60.00, output 270.00'
+    evidence: 'gpt-5.4-pro (<272K) | $30.00 | - | - | $180.00; long: $60.00 / $270.00; Batch short $15.00/$90.00 (long $30.00/$135.00)'
+  - model: gpt-5.2
+    display_name: gpt-5.2
+    input_per_mtok: 1.75
+    output_per_mtok: 14
+    cache_read_per_mtok: 0.175
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 0.875
+    batch_output_per_mtok: 7
+    long_context_note: null
+    evidence: gpt-5.2 | $1.75 | $0.175 | - | $14.00; Batch $0.875 / $7.00
+  - model: gpt-5.2-pro
+    display_name: gpt-5.2-pro
+    input_per_mtok: 21
+    output_per_mtok: 168
+    cache_read_per_mtok: null
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 10.5
+    batch_output_per_mtok: 84
+    long_context_note: null
+    evidence: gpt-5.2-pro | $21.00 | - | - | $168.00; Batch $10.50 / $84.00
+  - model: gpt-5.1
+    display_name: gpt-5.1
+    input_per_mtok: 1.25
+    output_per_mtok: 10
+    cache_read_per_mtok: 0.125
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 0.625
+    batch_output_per_mtok: 5
+    long_context_note: null
+    evidence: gpt-5.1 | $1.25 | $0.125 | - | $10.00; Batch $0.625 / $5.00
+  - model: gpt-5
+    display_name: gpt-5
+    input_per_mtok: 1.25
+    output_per_mtok: 10
+    cache_read_per_mtok: 0.125
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 0.625
+    batch_output_per_mtok: 5
+    long_context_note: null
+    evidence: gpt-5 | $1.25 | $0.125 | - | $10.00; Batch $0.625 / $5.00
+  - model: gpt-5-mini
+    display_name: gpt-5-mini
+    input_per_mtok: 0.25
+    output_per_mtok: 2
+    cache_read_per_mtok: 0.025
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 0.125
+    batch_output_per_mtok: 1
+    long_context_note: null
+    evidence: gpt-5-mini | $0.25 | $0.025 | - | $2.00; Batch $0.125 / $1.00
+  - model: gpt-5-nano
+    display_name: gpt-5-nano
+    input_per_mtok: 0.05
+    output_per_mtok: 0.4
+    cache_read_per_mtok: 0.005
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 0.025
+    batch_output_per_mtok: 0.2
+    long_context_note: null
+    evidence: gpt-5-nano | $0.05 | $0.005 | - | $0.40; Batch $0.025 / $0.20
+  - model: gpt-5-pro
+    display_name: gpt-5-pro
+    input_per_mtok: 15
+    output_per_mtok: 120
+    cache_read_per_mtok: null
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 7.5
+    batch_output_per_mtok: 60
+    long_context_note: null
+    evidence: gpt-5-pro | $15.00 | - | - | $120.00; Batch $7.50 / $60.00
+  - model: gpt-4.1
+    display_name: gpt-4.1
+    input_per_mtok: 2
+    output_per_mtok: 8
+    cache_read_per_mtok: 0.5
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 1
+    batch_output_per_mtok: 4
+    long_context_note: null
+    evidence: gpt-4.1 | $2.00 | $0.50 | - | $8.00; Batch $1.00 / $4.00
+  - model: gpt-4.1-mini
+    display_name: gpt-4.1-mini
+    input_per_mtok: 0.4
+    output_per_mtok: 1.6
+    cache_read_per_mtok: 0.1
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 0.2
+    batch_output_per_mtok: 0.8
+    long_context_note: null
+    evidence: gpt-4.1-mini | $0.40 | $0.10 | - | $1.60; Batch $0.20 / $0.80
+  - model: gpt-4.1-nano
+    display_name: gpt-4.1-nano
+    input_per_mtok: 0.1
+    output_per_mtok: 0.4
+    cache_read_per_mtok: 0.025
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 0.05
+    batch_output_per_mtok: 0.2
+    long_context_note: null
+    evidence: gpt-4.1-nano | $0.10 | $0.025 | - | $0.40; Batch $0.05 / $0.20
+  - model: gpt-4o
+    display_name: gpt-4o
+    input_per_mtok: 2.5
+    output_per_mtok: 10
+    cache_read_per_mtok: 1.25
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 1.25
+    batch_output_per_mtok: 5
+    long_context_note: null
+    evidence: gpt-4o | $2.50 | $1.25 | - | $10.00; Batch $1.25 / $5.00
+  - model: gpt-4o-mini
+    display_name: gpt-4o-mini
+    input_per_mtok: 0.15
+    output_per_mtok: 0.6
+    cache_read_per_mtok: 0.075
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 0.075
+    batch_output_per_mtok: 0.3
+    long_context_note: null
+    evidence: gpt-4o-mini | $0.15 | $0.075 | - | $0.60; Batch $0.075 / $0.30
+  - model: o3
+    display_name: o3
+    input_per_mtok: 2
+    output_per_mtok: 8
+    cache_read_per_mtok: 0.5
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 1
+    batch_output_per_mtok: 4
+    long_context_note: null
+    evidence: o3 | $2.00 | $0.50 | - | $8.00; Batch $1.00 / $4.00
+  - model: o3-pro
+    display_name: o3-pro
+    input_per_mtok: 20
+    output_per_mtok: 80
+    cache_read_per_mtok: null
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 10
+    batch_output_per_mtok: 40
+    long_context_note: null
+    evidence: o3-pro | $20.00 | - | - | $80.00; Batch $10.00 / $40.00
+  - model: o4-mini
+    display_name: o4-mini
+    input_per_mtok: 1.1
+    output_per_mtok: 4.4
+    cache_read_per_mtok: 0.275
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 0.55
+    batch_output_per_mtok: 2.2
+    long_context_note: null
+    evidence: o4-mini | $1.10 | $0.275 | - | $4.40; Batch $0.55 / $2.20
+  - model: o3-mini
+    display_name: o3-mini
+    input_per_mtok: 1.1
+    output_per_mtok: 4.4
+    cache_read_per_mtok: 0.55
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 0.55
+    batch_output_per_mtok: 2.2
+    long_context_note: null
+    evidence: o3-mini | $1.10 | $0.55 | - | $4.40; Batch $0.55 / $2.20
+  - model: text-embedding-3-small
+    display_name: text-embedding-3-small
+    input_per_mtok: 0.02
+    output_per_mtok: null
+    cache_read_per_mtok: null
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: null
+    batch_output_per_mtok: null
+    long_context_note: null
+    evidence: Embedding | text-embedding-3-small | $0.02
+  - model: text-embedding-3-large
+    display_name: text-embedding-3-large
+    input_per_mtok: 0.13
+    output_per_mtok: null
+    cache_read_per_mtok: null
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: null
+    batch_output_per_mtok: null
+    long_context_note: null
+    evidence: Embedding | text-embedding-3-large | $0.13
+  - model: text-embedding-ada-002
+    display_name: text-embedding-ada-002
+    input_per_mtok: 0.1
+    output_per_mtok: null
+    cache_read_per_mtok: null
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: null
+    batch_output_per_mtok: null
+    long_context_note: null
+    evidence: Embedding | text-embedding-ada-002 | $0.10
+- provider: google
+  source_url: https://ai.google.dev/gemini-api/docs/pricing
+  models:
+  - model: gemini-4-argon
+    display_name: gemini-4-argon
+    input_per_mtok: 2.0
+    output_per_mtok: 10.0
+    cache_read_per_mtok: 0.1
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 1.0
+    batch_output_per_mtok: 5.0
+    long_context_note: 'Price changes from Dec 1, 2026: input $4.00, output $20.00, caching $0.20 (implicit only); batch then $2.00/$10.00/$0.10'
+    evidence: 'gemini-4-argon | $2.00 (through Nov 30, 2026); $4.00 (from Dec 1, 2026) | $10.00; $20.00 | $0.10; $0.20 (implicit only). Batch: $1.00; $2.00 from Dec 1 | $5.00; $10.00'
+  - model: gemini-3.8-flash
+    display_name: gemini-3.8-flash
+    input_per_mtok: 0.75
+    output_per_mtok: 3.75
+    cache_read_per_mtok: 0.075
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 0.375
+    batch_output_per_mtok: 1.875
+    long_context_note: 'Price changes from Jan 1, 2027: input $1.50, output $7.50, caching $0.15 + storage $1.00/hr (now $0.50/hr); batch then $0.75/$3.75'
+    evidence: 'gemini-3.8-flash | $0.75; $1.50 (from Jan 1, 2027) | $3.75; $7.50 | $0.075; $0.15, plus storage $0.50/hr; $1.00/hr from 2027. Batch: $0.375; $0.75 | $1.875; $3.75'
+  - model: gemini-3.6-flash
+    display_name: gemini-3.6-flash
+    input_per_mtok: 0.75
+    output_per_mtok: 3.75
+    cache_read_per_mtok: 0.075
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 0.375
+    batch_output_per_mtok: 1.875
+    long_context_note: 'Price changes from Jan 1, 2027: input $1.50, output $7.50, caching $0.15; storage $0.50/hr -> $1.00/hr'
+    evidence: 'gemini-3.6-flash | $0.75; $1.50 (from Jan 1, 2027) | $3.75; $7.50 | $0.075; $0.15, plus storage $0.50/hr; $1.00/hr from 2027. Batch: $0.375; $0.75 | $1.875; $3.75'
+  - model: gemini-3.5-flash-lite
+    display_name: gemini-3.5-flash-lite
+    input_per_mtok: 0.3
+    output_per_mtok: 2.5
+    cache_read_per_mtok: 0.03
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 0.15
+    batch_output_per_mtok: 1.25
+    long_context_note: null
+    evidence: 'gemini-3.5-flash-lite | $0.30 (text/image/video/audio) | $2.50 | $0.03, plus storage $1.00/hr. Batch: $0.15 | $1.25 | $0.02'
+  - model: gemini-3.1-flash-lite
+    display_name: gemini-3.1-flash-lite
+    input_per_mtok: 0.25
+    output_per_mtok: 1.5
+    cache_read_per_mtok: 0.025
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 0.125
+    batch_output_per_mtok: 0.75
+    long_context_note: Input audio $0.50 (batch $0.25); caching audio $0.05
+    evidence: 'gemini-3.1-flash-lite | $0.25 (text/image/video); $0.50 (audio) | $1.50 | $0.025 (text/image/video); $0.05 (audio), plus storage $1.00/hr. Batch: $0.125 / $0.25 audio | $0.75'
+  - model: gemini-3.1-pro-preview
+    display_name: gemini-3.1-pro-preview
+    input_per_mtok: 2.0
+    output_per_mtok: 12.0
+    cache_read_per_mtok: 0.2
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 1.0
+    batch_output_per_mtok: 6.0
+    long_context_note: 'Prompts >200k tokens: input $4.00, output $18.00, caching $0.40 (batch >200k: input $2.00, output $9.00)'
+    evidence: 'gemini-3.1-pro-preview (and -customtools) | $2.00 (<=200k tokens); $4.00 (>200k) | $12.00 (<=200k); $18.00 (>200k) | $0.20 (<=200k); $0.40 (>200k), plus storage $4.50/hr. Batch: $1.00 (<=200k);
+      $2.00 (>200k) | $6.00; $9.00'
+  - model: gemini-3-flash-preview
+    display_name: gemini-3-flash-preview
+    input_per_mtok: 0.5
+    output_per_mtok: 3.0
+    cache_read_per_mtok: 0.05
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 0.25
+    batch_output_per_mtok: 1.5
+    long_context_note: Audio input $1.00 (batch $0.50); caching audio $0.10
+    evidence: 'gemini-3-flash-preview | $0.50 (text/image/video); $1.00 (audio) | $3.00 | $0.05 (text/image/video); $0.10 (audio), plus storage $1.00/hr. Batch: $0.25; $0.50 audio | $1.50'
+  - model: gemini-2.5-pro
+    display_name: gemini-2.5-pro
+    input_per_mtok: 1.25
+    output_per_mtok: 10.0
+    cache_read_per_mtok: 0.125
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 0.625
+    batch_output_per_mtok: 5.0
+    long_context_note: 'Prompts >200k tokens: input $2.50, output $15.00, caching $0.25 (batch >200k: input $1.25, output $7.50)'
+    evidence: 'gemini-2.5-pro | $1.25 (<=200k); $2.50 (>200k) | $10.00 (<=200k); $15.00 (>200k) | $0.125 (<=200k); $0.25 (>200k), plus storage $4.50/hr. Batch: $0.625; $1.25 | $5.00; $7.50'
+  - model: gemini-2.5-flash
+    display_name: gemini-2.5-flash
+    input_per_mtok: 0.3
+    output_per_mtok: 2.5
+    cache_read_per_mtok: 0.03
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 0.15
+    batch_output_per_mtok: 1.25
+    long_context_note: Audio input $1.00 (batch $0.50)
+    evidence: 'gemini-2.5-flash | $0.30 (text/image/video); $1.00 (audio) | $2.50 | $0.03 (text/image/video); $0.1 (audio), plus storage $1.00/hr. Batch: $0.15; $0.50 audio | $1.25'
+  - model: gemini-2.5-flash-lite
+    display_name: gemini-2.5-flash-lite
+    input_per_mtok: 0.1
+    output_per_mtok: 0.4
+    cache_read_per_mtok: 0.01
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 0.05
+    batch_output_per_mtok: 0.2
+    long_context_note: Audio input $0.30 (batch $0.15)
+    evidence: 'gemini-2.5-flash-lite | $0.10 (text/image/video); $0.30 (audio) | $0.40 | $0.01 (text/image/video); $0.03 (audio), plus storage $1.00/hr. Batch: $0.05; $0.15 audio | $0.20'
+  - model: gemini-embedding-2
+    display_name: gemini-embedding-2
+    input_per_mtok: 0.2
+    output_per_mtok: null
+    cache_read_per_mtok: null
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: 0.1
+    batch_output_per_mtok: null
+    long_context_note: Text input shown. Image $0.45 ($0.00012/image), audio $6.50 ($0.00016/s), video $12.00 ($0.00079/frame); batch half
+    evidence: gemini-embedding-2 (text input) | Standard $0.20 | Batch $0.10
+- provider: deepseek
+  source_url: https://api-docs.deepseek.com/quick_start/pricing
+  models:
+  - model: deepseek-flash
+    display_name: DeepSeek-V4.1-Flash-1017
+    input_per_mtok: 0.15
+    output_per_mtok: 0.6
+    cache_read_per_mtok: 0.003
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: null
+    batch_output_per_mtok: null
+    long_context_note: 'Off-peak prices shown; peak (01:00-04:00 and 06:00-10:00 UTC Mon-Fri excl. Chinese holidays) is double: input miss 0.3, cache hit 0.006, output 1.2. Context 1M, max output 384K.'
+    evidence: deepseek-flash(1) | DeepSeek-V4.1-Flash-1017 | 1M | 384K | Cache Hit $0.003 / $0.006 | Cache Miss $0.15 / $0.3 | Output $0.6 / $1.2 (Off-Peak / Peak)
+  - model: deepseek-v4-pro
+    display_name: DeepSeek-V4-Pro-0813
+    input_per_mtok: 0.66
+    output_per_mtok: 1.98
+    cache_read_per_mtok: 0.022
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: null
+    batch_output_per_mtok: null
+    long_context_note: 'Off-peak prices shown; peak is double: input miss 1.32, cache hit 0.044, output 3.96. Context 1M, max output 384K.'
+    evidence: deepseek-v4-pro | DeepSeek-V4-Pro-0813 | 1M | 384K | Cache Hit $0.022 / $0.044 | Cache Miss $0.66 / $1.32 | Output $1.98 / $3.96 (Off-Peak / Peak)
+- provider: mistral
+  source_url: https://mistral.ai/pricing
+  models:
+  - model: null
+    display_name: Mistral Large (version unspecified)
+    input_per_mtok: 0.5
+    output_per_mtok: 1.5
+    cache_read_per_mtok: null
+    cache_write_per_mtok: null
+    cache_write_1h_per_mtok: null
+    batch_input_per_mtok: null
+    batch_output_per_mtok: null
+    long_context_note: Page also says batch processing reduces price by 50% and cached input tokens by up to 90%; no per-model batch/cache numbers published.
+    evidence: Mistral Large costs $0.5 /M tokens in and $1.5 /M tokens out.

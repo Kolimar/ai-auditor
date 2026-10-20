@@ -1,0 +1,49 @@
+fixture: v2c_mobile_app
+description: App móvil iOS/Android con agentes de arquitectura, análisis de crashes y tareas mecánicas de localización y versionado.
+labeled_by: holdout-v2 author (claude_code)
+expectations:
+  - id: E1
+    rule: ANY
+    component: swiftui-architect
+    expect: absent
+    rationale: Diseño de arquitectura con decisiones de estado y navegación; razonamiento complejo y generación abierta.
+  - id: E2
+    rule: ANY
+    component: crash-analyst
+    expect: absent
+    rationale: Lista de comandos permitidos como ayuda, pero el trabajo es razonar sobre una causa raíz; look-alike de LLM-017 y de LLM-009 (el stack trace se interpreta).
+  - id: E3
+    rule: ANY
+    component: ui-test-writer
+    expect: absent
+    rationale: Generación de código de test a partir de lectura de pantallas y convenciones; código no trivial.
+  - id: E4
+    rule: [LLM-010, LLM-009]
+    component: strings-sync
+    expect: present
+    rationale: XML estable a formato clave=valor con reglas fijas de placeholders; conversión de formato sin cambio semántico (LLM-010) sobre entrada con estructura de máquina (LLM-009).
+  - id: E5
+    rule: LLM-003
+    component: version-bumper
+    expect: present
+    rationale: Editar dos valores en plist y gradle es una tarea mecánica; opus es sobredimensionado.
+  - id: E6
+    rule: ANY
+    component: store-release-notes
+    expect: absent
+    rationale: Redacción creativa con límites de longitud y tono, selección de lo visible para el usuario; generación abierta.
+  - id: E7
+    rule: LLM-017
+    component: ship-testflight
+    expect: present
+    rationale: Cinco comandos fijos en secuencia, sin variación según la entrada; un script fastlane/shell los ejecuta.
+  - id: E8
+    rule: ANY
+    component: fix-crash
+    expect: absent
+    rationale: El argumento es un id; el trabajo es diagnosticar y escribir un arreglo con razonamiento; herramientas heredadas y tarea de código.
+  - id: E9
+    rule: [LLM-011, LLM-009]
+    component: localize-check
+    expect: present
+    rationale: Comprobar que claves existen y que cuentan de placeholders coinciden entre archivos XML es una validación estructural (claves requeridas) computable por código.

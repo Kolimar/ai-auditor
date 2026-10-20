@@ -1,0 +1,11 @@
+fixture: a04_prose_commitments
+description: Extraccion de compromisos desde transcripcion informal.
+labeled_by: red-team
+expectations:
+  - id: E1
+    rule: [LLM-009, LLM-010, LLM-001, LLM-003]
+    component: extract_commitments
+    expect: absent
+    rationale: >-
+      "Extract" sobre prosa libre con redaccion variable: LLM-009 "No es: extraccion desde prosa libre".
+      Requiere resolver correferencias y juzgar aceptacion; razonamiento no trivial (LLM-003 "No es").

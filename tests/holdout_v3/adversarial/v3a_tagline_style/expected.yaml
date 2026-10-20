@@ -1,0 +1,15 @@
+fixture: v3a_tagline_style
+description: Generador de eslóganes creativos para etiquetas de cerveza artesanal con ejemplos de estilo.
+labeled_by: holdout-v3 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-019
+    component: tagline_writer
+    expect: absent
+    rationale: >-
+      Los ejemplos ilustran un rango de voz, no un mapeo entrada-salida estable; la salida es generación creativa abierta (LLM-019 exige mapeo consistente).
+  - id: E2
+    rule: ANY
+    component: write_tagline
+    expect: absent
+    rationale: Generación creativa abierta; el LLM está justificado.

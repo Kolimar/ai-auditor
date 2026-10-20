@@ -1,0 +1,16 @@
+fixture: v2a_research_loop
+description: Agente de investigación manual con presupuesto de pasos y de tiempo.
+labeled_by: holdout-v2 adversarial author
+expectations:
+  - id: E1
+    rule: LLM-021
+    component: run_research
+    expect: absent
+    rationale: >-
+      Aunque el bucle es while True, está acotado por MAX_STEPS y un deadline; tras el presupuesto se retiran las
+      herramientas y el modelo devuelve una respuesta final, por lo que termina. No es un loop sin cota.
+  - id: E2
+    rule: ANY
+    component: run_research
+    expect: absent
+    rationale: Investigación abierta con herramientas dependientes del contenido; LLM justificado (excluido de LLM-017, LLM-003).

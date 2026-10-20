@@ -1,0 +1,65 @@
+fixture: v3c_game_dungeonforge
+description: Configuración Claude Code de un roguelike en Godot con agentes de balance, QA, narrativa y release.
+labeled_by: holdout-v3 author (claude_code A)
+expectations:
+  - id: E1
+    rule: LLM-010
+    component: balance-sheet-formatter
+    expect: present
+    rationale: >-
+      Convierte JSON con claves fijas en tabla Markdown ordenada, sin cambio semántico; es formateo puro (LLM-010).
+      Tiene Write pero la transformación es mecánica y acotada, así que sigue siendo candidato.
+  - id: E2
+    rule: LLM-011
+    component: loot-table-validator
+    expect: present
+    rationale: >-
+      Comprueba campos requeridos, tipos y rangos de JSON contra una estructura fija: validación de schema (LLM-011).
+  - id: E3
+    rule: ANY
+    component: gameplay-bug-investigator
+    expect: absent
+    rationale: >-
+      Lista comandos permitidos (allowlist) pero el trabajo es investigar y razonar hipótesis; no es una secuencia fija
+      de herramientas (excluida en LLM-017) ni una tarea simple.
+  - id: E4
+    rule: ANY
+    component: level-design-critic
+    expect: absent
+    rationale: Revisión creativa con opus y effort alto, razonamiento abierto; LLM-003 no aplica a tareas de juicio.
+  - id: E5
+    rule: ANY
+    component: quest-writer
+    expect: absent
+    rationale: Generación narrativa abierta con restricciones de tono; modelo grande justificado.
+  - id: E6
+    rule: LLM-017
+    component: ship-build
+    expect: present
+    rationale: >-
+      Bloque de comandos que se ejecutan en orden fijo e invariante (limpiar, exportar, firmar, etiquetar); pueden
+      lanzarse desde un script sin LLM.
+  - id: E7
+    rule: ANY
+    component: explain-crash
+    expect: absent
+    rationale: El argumento lo rellena el usuario con una ruta y el modelo debe interpretar la traza y el código; juicio.
+  - id: E8
+    rule: ANY
+    component: npc-barks
+    expect: absent
+    rationale: Generación creativa de texto corto con voz de personaje; abierta.
+  - id: E9
+    rule: ANY
+    component: shader-perf-triage
+    expect: absent
+    rationale: >-
+      Skill procedimental larga con pasos enumerados, pero cada paso requiere juicio (ponderar coste frente a impacto
+      visual); tiene herramientas que actúan pero la tarea no es mecánica (cc_procedure).
+  - id: E10
+    rule: ANY
+    component: ship-notes
+    expect: optional
+    rationale: >-
+      Reescritura de prosa con tono de estudio (legítima), pero agrupar cambios es en parte mecánico; caso límite, se
+      acepta cualquier resultado.
