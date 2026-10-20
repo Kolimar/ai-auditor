@@ -240,11 +240,16 @@ positivos en el golden dataset. Un experimento REJECT también convierte la reco
 
 ## Política para Claude Code (agentes, skills, comandos)
 
-Se aplica igual a los playbooks de Devin (`*.devin.md`), a las reglas y comandos de Cursor y a los `.md` sueltos
-leídos con `--md-instructions`. Fuera de Claude Code no hay lista de herramientas: se asume el conjunto completo
+Se aplica igual a los playbooks de Devin (`*.devin.md`), a las reglas y comandos de Cursor, a los stages y agentes de
+AI-DLC y a los `.md` sueltos leídos con `--md-instructions`. Fuera de Claude Code no hay lista de herramientas: se asume el conjunto completo
 del agente. Las reglas `.cursorrules` y `alwaysApply: true` cuentan como memoria siempre cargada.
 
 - Subagentes y skills se ejecutan en contextos separados: LLM-005 (contexto repetido) no se aplica entre ellos.
+- AI-DLC: los stages son pasos que ejecuta su `lead_agent`, con la persona del agente y su `knowledge/<agente>/` en el
+  mismo contexto. LLM-012 no los trata como saltos. El knowledge, los protocolos y las plantillas son contexto, los
+  scopes son configuración y los sensores (`kind: deterministic`) son comprobaciones deterministas, no pasos LLM. El
+  texto repetido entre un stage, su agente y su knowledge aparece en el mapa de `--for-agent`, no como hallazgo de
+  LLM-005.
 - Una lista explícita de herramientas built-in **restringe** el conjunto por defecto; solo las herramientas `mcp__`
   añaden schemas (LLM-023).
 - Copias idénticas del mismo plugin/agente se deduplican (diagnóstico `DUPLICATE_DEFINITION`); copias que divergen

@@ -149,8 +149,8 @@ class Node:
     attrs: dict[str, Any] = field(default_factory=dict)
 
 
-# Frameworks whose steps are Markdown instructions run by a coding agent (agents, skills, playbooks, rules)
-INSTRUCTION_FRAMEWORKS = frozenset({"claude_code", "devin", "cursor", "markdown"})
+# Frameworks whose steps are Markdown instructions run by a coding agent (agents, skills, playbooks, rules, stages)
+INSTRUCTION_FRAMEWORKS = frozenset({"claude_code", "devin", "cursor", "markdown", "aidlc"})
 
 
 @dataclass

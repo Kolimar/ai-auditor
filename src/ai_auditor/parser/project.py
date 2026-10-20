@@ -16,7 +16,7 @@ from ai_auditor import __version__
 from ai_auditor.config import AuditConfig
 from ai_auditor.ir.model import INSTRUCTION_FRAMEWORKS, Diagnostic, FileRecord, LLMStep, NodeKind, SourceLocation, SystemIR
 from ai_auditor.parser.claude_code import EXTRACTOR_VERSION as CC_VERSION
-from ai_auditor.parser.claude_code import extract_claude_file, link_claude_code
+from ai_auditor.parser.claude_code import extract_claude_file, link_claude_code, link_context
 from ai_auditor.parser.discovery import discover
 from ai_auditor.parser.python.extractor import EXTRACTOR_VERSION as PY_VERSION
 from ai_auditor.parser.python.extractor import PythonProjectExtractor, non_production_path
@@ -74,7 +74,10 @@ def extract_project(root: Path, config: AuditConfig, use_cache: bool = True) -> 
         if sf.kind == "python":
             continue
         digest = sf.sha256()
-        key = hashlib.sha256(f"{__version__}|{CC_VERSION}|{sf.kind}|{sf.rel}|{digest}".encode()).hexdigest()[:32]
+        if sf.kind == "code":  # not parsed: listed and scanned for the agent's brief
+            ir.files.append(FileRecord(sf.rel, digest, sf.kind))
+            continue
+        key = hashlib.sha256(f"{__version__}|{CC_VERSION}|{sf.kind}|{sf.framework}|{sf.owner}|{sf.rel}|{digest}".encode()).hexdigest()[:32]
         part = cache.get(key)
         if part is None:
             try:
@@ -113,6 +116,7 @@ def extract_project(root: Path, config: AuditConfig, use_cache: bool = True) -> 
                 node.attrs["non_production_reason"] = "exploratory notebook (set `notebooks: production` to audit it)"
     _dedupe_memory(ir)
     _dedupe_claude_code(ir)
+    link_context(ir)
     link_claude_code(ir)
     for step in ir.llm_steps():
         if step.model.raw is None and not step.model.inherited:

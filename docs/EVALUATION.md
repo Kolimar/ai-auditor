@@ -115,9 +115,16 @@ configuración real de Claude Code.
   - se corrigió el texto de la nota de LLM-004 en `docs/RULES.md` para que coincida con el código;
   - el auditor ya no recorre `~/.claude/plugins/marketplaces/`, el catálogo de marketplace que Claude Code no carga;
   - un archivo suelto pasado como ruta se clasifica por su ruta completa y, si es otro `.md`, se lee como
-    instrucciones.
+    instrucciones;
+  - soporte para AI-DLC: stages como pasos, knowledge y protocolos como contexto, scopes como configuración y
+    sensores como comprobaciones deterministas; LLM-012 ya no trata un stage como salto;
+  - los `.md` de la carpeta de una skill, los de carpetas de conocimiento (con `--md-instructions`) y los `.md` sueltos
+    que otro archivo manda leer pasan a ser contexto, no pasos;
+  - se ignoran las carpetas de sesión de `~/.claude` (`projects`, `shell-snapshots`…).
 
-  Ningún fixture tiene esa carpeta ni se analiza como archivo suelto, así que las cifras no cambian.
+  Ningún fixture tiene esos casos, salvo una referencia a archivos inexistentes que solo añade un atributo. Tras
+  estos cambios se volvió a pasar el benchmark como comprobación de regresión: ajuste 106/5/1 y holdout v3 52/55/13,
+  sin cambios. Al estar ya visto, holdout v3 no cuenta como una medición nueva.
 
 ## Limitaciones
 
@@ -126,8 +133,9 @@ configuración real de Claude Code.
 - El recall en sistemas nuevos ronda 0.5: el auditor encuentra más o menos la mitad de lo etiquetado.
 - La confianza es heurística y no está recalibrada.
 - No se ha ejecutado ningún experimento contra un modelo real.
-- El soporte para Devin, Cursor y `.md` sueltos (`--md-instructions`), y el encargo para el agente (`--for-agent`,
-  con su lista de piezas externas), se añadieron después de estas mediciones. Tienen tests unitarios, pero ningún fixture del benchmark los cubre:
+- El soporte para Devin, Cursor, AI-DLC y `.md` sueltos (`--md-instructions`), el encargo para el agente
+  (`--for-agent`, con el mapa del flujo y las piezas externas) y `ai-auditor report` se añadieron después de estas
+  mediciones. Tienen tests unitarios, pero ningún fixture del benchmark los cubre:
   su calidad no está medida. Lo que encuentre el agente con `--for-agent` es su criterio, no una medición.
 
 ## Cómo reproducir

@@ -1,12 +1,13 @@
 ---
 name: ai-auditor
-description: Audita skills, agentes, playbooks, reglas, prompts o código con LLM (un archivo, una carpeta, un repositorio o un flujo completo) y devuelve un informe de mejoras. Señala qué partes no necesitan IA, cuáles gastan contexto de más y qué pasos se pueden simplificar. Úsala cuando pidan auditar, revisar u optimizar instrucciones para IA (Claude Code, Devin, Cursor) o un sistema que llama a un LLM.
+description: Audita skills, agentes, playbooks, reglas, stages de AI-DLC, prompts o código con LLM (un archivo, una carpeta, un repositorio o un flujo completo) y devuelve un informe de mejoras con las citas verificadas. Señala qué partes no necesitan IA, cuáles gastan contexto de más y qué pasos se pueden simplificar. Úsala cuando pidan auditar, revisar u optimizar instrucciones para IA (Claude Code, Devin, Cursor) o un sistema que llama a un LLM.
 ---
 
 # Auditoría con ai-auditor y revisión propia
 
 La herramienta es determinista y conservadora: encuentra más o menos la mitad de lo que vería una persona. Tú
-completas el análisis leyendo lo que ella no supo clasificar y revisando el flujo entero, que ella no ve.
+completas el análisis leyendo lo que ella no supo clasificar y revisando el flujo entero. Ella te da los hechos medidos
+(qué carga cada paso, texto repetido, código, piezas externas) y después comprueba tus citas contra los archivos.
 
 ## 1. Qué analizar
 
@@ -14,6 +15,7 @@ completas el análisis leyendo lo que ella no supo clasificar y revisando el flu
 |---|---|
 | un archivo (skill, agente, playbook, prompt) | ese archivo |
 | una carpeta o un repositorio local | esa carpeta; si son `.md` sueltos sin nombres estándar (playbooks exportados, prompts), añade `--md-instructions` |
+| un plugin o una instalación de AI-DLC | su carpeta (se reconoce sola); los protocolos del core que referencia salen como piezas externas: para medirlos, analiza también el core o la instalación |
 | un repositorio remoto (URL) | clónalo sin historial en una carpeta temporal (`git clone --depth 1 URL "$(mktemp -d)/repo"`) y analiza esa carpeta |
 | «mis skills» o «mis agentes» | `~/.claude`, y también `~/.config/devin/skills`, `~/.cursor` o `~/.agents` si existen |
 | un flujo completo | el punto de entrada, y después sigue el paso 4 |
@@ -33,6 +35,8 @@ Si no lo está:
 uvx --from git+https://github.com/Kolimar/ai-auditor ai-auditor analyze RUTA --for-agent -f markdown
 ```
 
+(Con `uvx`, usa el mismo prefijo para `ai-auditor report` en el paso 5.)
+
 El análisis no llama a ninguna IA, no cuesta dinero y no modifica lo analizado.
 
 ## 3. Revisar
@@ -41,8 +45,11 @@ El informe tiene dos partes:
 
 1. Las recomendaciones de la herramienta.
 2. La sección **"Brief for the agent running the auditor"**: es tu encargo. Síguela al pie de la letra.
+   - Empieza por **"Workflow map"**: qué carga cada paso y cuántos tokens suma, qué ejecuta, texto repetido entre
+     archivos que se cargan juntos, código que la herramienta no parsea y piezas externas. Son hechos medidos:
+     úsalos como evidencia.
    - Abre cada fichero de "To review" y aplica la tabla de patrones.
-   - Confirma o descarta cada aviso de "To double-check" con un motivo.
+   - Confirma o descarta cada aviso de "To double-check" por su id, con un motivo.
 
 ## 4. Flujos completos
 
@@ -62,18 +69,28 @@ Por ejemplo: una skill que llama a una herramienta que clona un repositorio con 
    - repos o documentos enteros en contexto cuando bastaría una búsqueda (LLM-015/016);
    - bucles sin límite de turnos, tiempo o presupuesto (LLM-021).
 
-## 5. Informe
+## 5. Verificar y armar el informe
 
-Responde en el idioma del usuario, con estas partes por separado:
+1. Escribe tu revisión en un JSON con el formato de "Answer format", en una carpeta temporal. Cada hallazgo lleva el
+   archivo y una frase **copiada tal cual** de ese archivo.
+2. Ejecuta:
 
-1. **Resumen:** qué se analizó (rutas, piezas externas incluidas u omitidas) y las tres mejoras más importantes.
-2. **Recomendaciones de la herramienta:** las que confirmes. Las que descartes, con el motivo.
-3. **Revisión del agente:** lo que encontraste tú, en la tabla que pide el encargo, citando el texto de la
-   instrucción. Deja claro que es tu criterio, no una medición.
-4. **Flujo completo** (si se pidió): el mapa de la cadena y los problemas entre pasos.
-5. **Bien usado:** una línea con lo que sí necesita IA.
+   ```bash
+   ai-auditor report RUTA --review /tmp/.../revision.json -f markdown
+   ```
 
-Si el usuario lo pide, guarda el informe en un `.md`.
+   La herramienta busca cada cita en su archivo y le pone el número de línea. Marca como **no verificado** lo que no
+   encuentra: citas inexistentes, archivos o reglas desconocidos, niveles que una revisión no puede tener e ids de
+   avisos que no existen.
+3. Corrige o quita lo no verificado y vuelve a ejecutarlo hasta que no quede nada en "Not verified".
+4. Presenta el resultado en el idioma del usuario con la misma estructura:
+   - resumen y mejoras principales;
+   - recomendaciones de la herramienta;
+   - revisión del agente, aclarando que es tu criterio y no una medición;
+   - piezas externas;
+   - lo que sí necesita IA.
+
+Si el usuario lo pide, guarda el informe con `-o informe.md`.
 
 ## Reglas
 

@@ -167,9 +167,10 @@ class UnnecessaryDelegation(Rule):
         for step in ctx.ir.llm_steps():
             if skip_step(step) or step.step_kind != StepKind.AGENT:
                 continue
-            if step.framework in INSTRUCTION_FRAMEWORKS and (step.attrs.get("cc_type") in ("skill", "command") or int(step.attrs.get("body_tokens") or 0) > 400):
+            if step.framework in INSTRUCTION_FRAMEWORKS and (step.attrs.get("cc_type") in ("skill", "command", "stage") or int(step.attrs.get("body_tokens") or 0) > 400):
                 # skills and substantial agents do their own work; a command is a prompt the user types into the main
-                # session, which runs anyway: invoking an agent from it adds no hop
+                # session, which runs anyway: invoking an agent from it adds no hop; an AI-DLC stage is run by its
+                # lead agent, not handed to it
                 continue
             delegates = [d for d in ctx.graph.delegates_of(step.id) if isinstance(d, LLMStep)]
             if len(delegates) != 1:

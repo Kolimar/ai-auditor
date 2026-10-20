@@ -1,6 +1,7 @@
 """Command-line interface.
 
     ai-auditor analyze PATH [--traces DIR] [--format text|markdown|json|sarif] [--output FILE] [--min-level LEVEL]
+    ai-auditor report PATH --review REVIEW.json   # check an agent's review against the files; final report
     ai-auditor ir PATH                 # dump the intermediate representation (JSON)
     ai-auditor graph PATH [--dot]      # workflow graph (Mermaid by default)
     ai-auditor rules                   # list registered rules
@@ -85,6 +86,24 @@ def cmd_analyze(args: argparse.Namespace) -> int:
         bar = EvidenceLevel[args.fail_on]
         if any(f.actionable and not f.superseded_by and f.level >= bar for f in findings):
             return 2
+    return 0
+
+
+def cmd_report(args: argparse.Namespace) -> int:
+    from ai_auditor.audit import audit, min_level_filter
+    from ai_auditor.reporting.review import load_review, render_report, report_json, verify_review
+    from ai_auditor.reporting.workflow_map import build_map
+
+    review = load_review(Path(args.review))
+    cfg = _config(args)
+    res = audit(Path(args.path), cfg, use_cache=not args.no_cache)
+    findings = min_level_filter(res.findings, cfg.min_level)
+    wmap = build_map(res)
+    checked = verify_review(res, review, findings, wmap)
+    _write((report_json if args.format == "json" else render_report)(res, findings, wmap, checked), args.output)
+    bad = sum(1 for f in checked["findings"] if not f["verified"]) + len(checked["errors"])
+    if bad:
+        print(f"ai-auditor: {bad} item(s) of the review could not be verified: see 'Not verified'", file=sys.stderr)
     return 0
 
 
@@ -238,6 +257,13 @@ def build_parser() -> argparse.ArgumentParser:
                    help="append a brief for the AI agent running the auditor: the steps the static analysis could "
                         "not settle and a rubric to review them with its own judgement")
     a.set_defaults(func=cmd_analyze)
+
+    rp = sub.add_parser("report", help="check an agent's review (--for-agent answer, JSON) and render the final report")
+    common(rp)
+    rp.add_argument("--review", required=True, help="the agent's review as JSON (format in the --for-agent brief)")
+    rp.add_argument("--format", "-f", choices=["markdown", "json"], default="markdown")
+    rp.add_argument("--min-level", choices=["HYPOTHESIS", "LIKELY", "HIGH_CONFIDENCE", "PROVEN"])
+    rp.set_defaults(func=cmd_report)
 
     i = sub.add_parser("ir", help="dump the intermediate representation")
     common(i)

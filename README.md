@@ -1,8 +1,8 @@
 # ai-auditor — AI Workflow Optimization Auditor
 
 Analiza un sistema basado en LLMs: código Python con SDKs y frameworks, agentes, skills y comandos de Claude Code,
-skills de Devin y Cursor, playbooks de Devin, reglas y comandos de Cursor, o carpetas de prompts sueltos. Responde a
-esta pregunta:
+skills de Devin y Cursor, playbooks de Devin, reglas y comandos de Cursor, stages, agentes y plugins de AI-DLC, o
+carpetas de prompts sueltos. Responde a esta pregunta:
 
 > **¿Qué partes de este sistema necesitan realmente un LLM y cuáles podrían resolverse de forma más barata, rápida,
 > determinística o fiable — y con qué evidencia?**
@@ -43,7 +43,9 @@ ai-auditor analyze ~/.claude                               # agentes, skills y c
 ai-auditor analyze .claude/agents/reviewer.md              # un solo archivo (cualquier .md se lee como instrucciones)
 ai-auditor analyze ./mi-repo                               # también *.devin.md, .cursorrules, .cursor/rules, .cursor/commands
 ai-auditor analyze ./playbooks --md-instructions           # carpeta de .md sueltos (p. ej. playbooks exportados)
-ai-auditor analyze ./my-agent-system --for-agent           # + encargo para el agente de IA que ejecuta la herramienta
+ai-auditor analyze ./mi-plugin-aidlc                       # AI-DLC: stages, agentes, knowledge, scopes y sensores
+ai-auditor analyze ./my-agent-system --for-agent           # + encargo y mapa del flujo para el agente de IA
+ai-auditor report ./my-agent-system --review revision.json # verifica la revisión del agente y arma el informe final
 ```
 
 ## Uso desde un agente de IA
@@ -55,20 +57,43 @@ Con `--for-agent`, el informe termina con un encargo para ese agente:
 
 - los pasos que el análisis determinista no supo clasificar, o que dio por justificados con poca evidencia;
 - los avisos más débiles, para confirmarlos o descartarlos;
-- las **piezas externas** que mencionan las instrucciones y que la herramienta no vio: repos que se clonan, descargas,
-  paquetes (`uvx`, `npx`…), scripts y servidores MCP;
+- un **mapa del flujo** con hechos medidos:
+  - qué carga cada paso en su contexto: su texto, el agente líder, el knowledge, la memoria y los archivos que le
+    mandan leer, con los tokens estimados y lo que alcanzaría siguiendo más referencias;
+  - qué ejecuta cada paso: scripts y sensores;
+  - frases repetidas entre archivos que acaban juntos en el mismo contexto;
+  - el código que la herramienta no parsea (TypeScript, JavaScript, shell…), con un escaneo de imports de SDKs de IA,
+    programas que lanza y repos que menciona;
+- las **piezas externas**: repos que se clonan (también desde código, como un script que clona una herramienta),
+  descargas, paquetes (`uvx`, `npx`…), programas, servidores MCP y archivos referenciados que no están en la carpeta;
 - una rúbrica con los patrones de cada paso y los del flujo entero: contexto repetido entre fases, saltos que no
-  aportan, pasos independientes en serie, trabajo repetido en cada ejecución, repos enteros en contexto y bucles sin
-  límite.
+  aportan, pasos independientes en serie, trabajo repetido en cada ejecución, repos enteros en contexto, bucles sin
+  límite y comprobaciones que el modelo repite aunque ya las hace un sensor o un script;
+- el formato JSON de la respuesta.
+
+`ai-auditor report RUTA --review revision.json` cierra el ciclo. Busca cada cita del agente en su archivo y le pone el
+número de línea. Marca como no verificado lo que no encuentra: citas inexistentes, archivos o reglas desconocidos,
+niveles que una revisión no puede tener e ids de avisos que no existen. Después arma el informe final con estructura
+fija:
+
+1. resumen y mejoras principales;
+2. recomendaciones de la herramienta, con el veredicto del agente;
+3. revisión del agente por paso y por flujo;
+4. lo no verificado;
+5. piezas externas;
+6. lo que sí necesita IA;
+7. los hechos medidos.
 
 La skill `skills/ai-auditor/SKILL.md` hace todo el recorrido:
 
 1. Elige qué analizar: un archivo, una carpeta, un repositorio (si es una URL, lo clona sin historial en una carpeta
    temporal) o tus skills instaladas.
-2. Ejecuta el auditor con `--for-agent` y sigue el encargo.
+2. Ejecuta el auditor con `--for-agent` y sigue el encargo, empezando por el mapa del flujo.
 3. Si pides el flujo completo, dibuja la cadena, audita cada pieza externa (sin ejecutarla) y revisa la cadena entera.
-4. Devuelve un informe con la recomendación de la herramienta, la revisión del agente (marcada como su criterio, no
-   como medición), los problemas del flujo y lo que sí necesita IA. Si se lo pides, lo guarda en un `.md`.
+4. Escribe su revisión en JSON, la pasa por `ai-auditor report` y corrige lo no verificado.
+5. Te devuelve el informe final: recomendaciones de la herramienta, revisión del agente (marcada como su criterio, no
+   como medición), problemas del flujo, piezas externas y lo que sí necesita IA. Si se lo pides, lo guarda en un
+   `.md`.
 
 Instalación de la skill (una vez):
 
@@ -237,7 +262,12 @@ Detalle, análisis de errores y declaraciones en `docs/EVALUATION.md`.
   para TypeScript ni para configuraciones YAML de orquestadores: los agentes de CrewAI definidos en `agents.yaml`
   aparecen sin prompt.
 - La herramienta solo ve el archivo o la carpeta que recibe: no sigue repos clonados, paquetes ni scripts externos.
-  Con `--for-agent` los lista, y es el agente quien los audita. Esa revisión del agente no está medida.
+  Con `--for-agent` los lista, y es el agente quien los audita. Esa revisión del agente no está medida: `report`
+  garantiza que sus citas existen, no que sus conclusiones sean correctas.
+- El código que no es Python (TypeScript, JavaScript, shell…) no se parsea. Solo se escanea en busca de imports de SDKs
+  de IA, programas que lanza y repos que menciona.
+- AI-DLC: un stage cuenta con su agente líder y el knowledge de ese agente, como en los stages *inline*. Los tokens
+  son estimaciones y las referencias se detectan por texto («Follow X.md», rutas, enlaces).
 - Los tokens se cuentan con una heurística (±25 %) salvo que `tiktoken` esté instalado; en ambos casos es una aproximación.
 - La confianza es heurística. En holdout v3 acertaron el 73 % de los hallazgos HYPOTHESIS (44) y el 83 % de los LIKELY
   (24), con ECE 0.20. En holdout v2 eran el 95 % y el 87 %. La brecha de confianza baja porque bajan los aciertos, no

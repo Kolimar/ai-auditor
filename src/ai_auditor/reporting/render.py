@@ -68,6 +68,8 @@ def _summary(res: AuditResult) -> dict[str, Any]:
         "files": res.extract_stats.get("files"),
         "llm_steps": len(steps),
         "agents": sum(1 for s in steps if s.step_kind.value == "agent"),
+        # Markdown steps are all agent-run; what they are (agent, skill, command, stage) is in cc_type
+        "step_kinds": dict(Counter(s.attrs.get("cc_type") or s.step_kind.value for s in steps)),
         "actionable": sum(1 for f in res.actionable if not f.superseded_by),
         "superseded": sum(1 for f in res.actionable if f.superseded_by),
         "by_level": dict(Counter(str(f.level) for f in res.actionable if not f.superseded_by)),
@@ -83,6 +85,11 @@ def _summary(res: AuditResult) -> dict[str, Any]:
     }
 
 
+def _kinds(s: dict[str, Any]) -> str:
+    plural = {"agent": "agents", "skill": "skills", "command": "commands", "stage": "stages", "call": "calls"}
+    return ", ".join(f"{n} {plural.get(k, k) if n != 1 else k}" for k, n in sorted(s["step_kinds"].items())) or "none"
+
+
 # ---------------------------------------------------------------------------------------------- markdown
 
 def render_markdown(res: AuditResult, findings: list[Finding] | None = None) -> str:
@@ -95,7 +102,7 @@ def render_markdown(res: AuditResult, findings: list[Finding] | None = None) -> 
     out: list[str] = ["# AI Workflow Optimization Audit", "", f"`{s['root']}`", ""]
     out += [
         "## Summary", "",
-        f"- Files analysed: {s['files']} · LLM steps: {s['llm_steps']} ({s['agents']} agents)",
+        f"- Files analysed: {s['files']} · LLM steps: {s['llm_steps']} ({_kinds(s)})",
         f"- Recommendations: **{len(act)}** ({', '.join(f'{k}: {v}' for k, v in sorted(s['by_level'].items())) or 'none'})"
         + (f", plus {len(sup)} superseded by a stronger one" if sup else ""),
         f"- Discarded by adversarial review: {s['discarded_by_review']} · LLM use justified: {s['llm_justified']}"
@@ -215,7 +222,7 @@ def render_text(res: AuditResult, findings: list[Finding] | None = None, max_ite
     act = [f for f in findings if f.actionable and not f.superseded_by]
     lines = [
         f"ai-auditor {s['auditor_version']}  {s['root']}",
-        f"files {s['files']} · LLM steps {s['llm_steps']} ({s['agents']} agents) · {sum(s['timings_ms'].values()):.0f} ms · auditor LLM calls: {s['llm_calls_made_by_auditor']}",
+        f"files {s['files']} · LLM steps {s['llm_steps']} ({_kinds(s)}) · {sum(s['timings_ms'].values()):.0f} ms · auditor LLM calls: {s['llm_calls_made_by_auditor']}",
         f"recommendations {len(act)} · discarded by review {s['discarded_by_review']} · justified {s['llm_justified']} · unassessed {s['unassessed_steps']}",
         *[f"!! {d.message}" for d in res.ir.diagnostics if d.code == "EXTRACTOR_CRASH"],
         f"runtime data: {'yes' if s['runtime_data'] else 'no (observed/estimated/validated savings: not available)'}"

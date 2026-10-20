@@ -120,6 +120,16 @@ Además, tu asistente puede revisar **un flujo entero**. Por ejemplo, una skill 
 vez descarga un repositorio con más skills. La herramienta sola solo ve la carpeta que le das; el asistente sigue la
 cadena, revisa cada pieza y te dice dónde se repite trabajo, dónde se carga demasiada información y qué pasos sobran.
 
+Para que no hable de memoria, la herramienta le da datos medidos:
+
+- cuánto texto carga cada paso;
+- qué frases están repetidas en varios archivos que se leen juntos;
+- qué código hay y si llama a una IA;
+- qué cosas de fuera usa (repos que se descargan, programas, archivos de otro paquete).
+
+Al final, la herramienta comprueba que cada frase que cita tu asistente está de verdad en el archivo. Lo que no
+encuentra lo marca como «no verificado».
+
 1. Instala la skill una sola vez. Copia la carpeta `skills/ai-auditor` de esta herramienta en la carpeta de skills de
    tu asistente:
    - Claude Code: `~/.claude/skills/` (Cursor también la lee de ahí);
@@ -132,8 +142,12 @@ cadena, revisa cada pieza y te dice dónde se repite trabajo, dónde se carga de
    - «audita este repositorio: https://github.com/usuario/repo»;
    - «audita el flujo completo de mi skill deploy y guárdame el informe en informe.md».
 
-Te responderá por partes: un resumen con las tres mejoras más importantes, lo que encontró la herramienta, lo que
-encontró él revisando y, si lo pediste, los problemas del flujo entero. Lo que encuentra el asistente es su opinión, no
+Te responderá por partes:
+
+- un resumen con las tres mejoras más importantes;
+- lo que encontró la herramienta;
+- lo que encontró él revisando, con las citas ya comprobadas;
+- si lo pediste, los problemas del flujo entero. Lo que encuentra el asistente es su opinión, no
 una medición: tómalo como una sugerencia que hay que comprobar.
 
 ## Cómo leer el informe
@@ -207,8 +221,9 @@ encuentra más o menos la mitad).
 
 **¿Qué proyectos entiende?**
 Programas en Python que usan IA (OpenAI, Anthropic, Google, LangChain, CrewAI…), los agentes, skills y comandos de
-Claude Code, las skills y playbooks de Devin, las skills, reglas y comandos de Cursor, y carpetas de instrucciones
-sueltas en `.md`. No entiende programas en otros lenguajes, como JavaScript.
+Claude Code, las skills y playbooks de Devin, las skills, reglas y comandos de Cursor, los plugins de AI-DLC y
+carpetas de instrucciones sueltas en `.md`. Los programas en otros lenguajes, como TypeScript o JavaScript, no los
+analiza a fondo: solo mira si llaman a una IA o a otros programas, y se los pasa a tu asistente para que los lea.
 
 **¿Puede revisar un repositorio de internet?**
 La herramienta sola, no: primero hay que descargarlo. Tu asistente de IA lo hace por ti si le pasas el enlace (ver «La
